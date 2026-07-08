@@ -196,6 +196,19 @@ let authEmailDraft = '';
 let syncTimer = null;
 let syncBusy = false;
 
+// ---- Teacher dashboard state ----
+let currentRole = 'student';
+let teacherStudents = [];
+let teacherLoading = false;
+let teacherError = '';
+let selectedStudentUid = null;
+let teacherSearch = '';
+let teacherAdviceSaving = false;
+let teacherAdviceMessage = '';
+let teacherAdviceMessageType = 'success';
+let teacherTipRef = null;
+let teacherTipHandler = null;
+
 function createDefaultState(){
   return {
   screen:'home', hurufIdx:0, sukuIdx:0, perkataanIdx:0, ayatIdx:0,
@@ -559,6 +572,11 @@ function render(){
     lucide.createIcons();
     return;
   }
+  if(currentRole === 'teacher'){
+    c.innerHTML = renderTeacherDashboard();
+    lucide.createIcons();
+    return;
+  }
   switch(state.screen){
     case 'home': c.innerHTML=renderHome();break;
     case 'profile': c.innerHTML=renderProfile();break;
@@ -577,6 +595,309 @@ function render(){
     case 'info': c.innerHTML=renderInfo();break;
   }
   lucide.createIcons();
+}
+
+
+function safeNumber(value){
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function formatTeacherDate(timestamp){
+  if(!timestamp) return 'Belum direkod';
+  try{
+    return new Intl.DateTimeFormat('ms-MY',{
+      day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'
+    }).format(new Date(Number(timestamp)));
+  }catch(error){
+    return 'Tidak diketahui';
+  }
+}
+
+function studentAccuracy(student){
+  const total = safeNumber(student?.lifetimeStats?.totalQuestionsAnswered);
+  const correct = safeNumber(student?.lifetimeStats?.correctAnswers);
+  return total > 0 ? Math.round((correct / total) * 100) : 0;
+}
+
+function studentStars(student){
+  return Array.isArray(student?.stars) ? student.stars.filter(Boolean).length : 0;
+}
+
+async function loadTeacherStudents(){
+  if(!currentUser || currentRole !== 'teacher') return;
+  teacherLoading = true;
+  teacherError = '';
+  render();
+  try{
+    const [usersSnapshot, notesSnapshot] = await Promise.all([
+      db.ref('users').once('value'),
+      db.ref('teacherNotes').once('value')
+    ]);
+    const data = usersSnapshot.val() || {};
+    const notes = notesSnapshot.val() || {};
+    teacherStudents = Object.entries(data)
+      .map(([uid,student]) => {
+        const note = notes[uid] || {};
+        return {
+          uid,
+          ...(student || {}),
+          teacherTip: typeof note.text === 'string' ? note.text : '',
+          teacherTipUpdatedAt: note.updatedAt || null,
+          teacherTipUpdatedByEmail: note.updatedByEmail || ''
+        };
+      })
+      .filter(student => student.uid !== currentUser.uid)
+      .sort((a,b) => String(a.studentName || '').localeCompare(String(b.studentName || ''),'ms'));
+  }catch(error){
+    console.error('Teacher dashboard:',error);
+    teacherError = 'Data murid tidak dapat dibaca. Semak Realtime Database Rules dan status akaun guru.';
+  }finally{
+    teacherLoading = false;
+    render();
+  }
+}
+
+function refreshTeacherData(){
+  playClick();
+  loadTeacherStudents();
+}
+
+function updateTeacherSearch(value){
+  teacherSearch = String(value || '');
+  render();
+  const input = document.getElementById('teacher-search');
+  if(input){
+    input.focus();
+    input.setSelectionRange(input.value.length,input.value.length);
+  }
+}
+
+function openStudentDetail(uid){
+  playClick();
+  selectedStudentUid = uid;
+  teacherAdviceMessage = '';
+  render();
+}
+
+function closeStudentDetail(){
+  playClick();
+  selectedStudentUid = null;
+  teacherAdviceMessage = '';
+  render();
+}
+
+async function saveTeacherAdvice(uid){
+  if(!currentUser || currentRole !== 'teacher' || teacherAdviceSaving) return;
+  const input = document.getElementById('teacher-advice-input');
+  const text = String(input?.value || '').trim();
+  if(text.length > 500){
+    teacherAdviceMessage = 'Nasihat terlalu panjang. Maksimum 500 aksara.';
+    teacherAdviceMessageType = 'error';
+    render();
+    return;
+  }
+
+  teacherAdviceSaving = true;
+  teacherAdviceMessage = '';
+  render();
+  try{
+    await db.ref(`teacherNotes/${uid}`).set({
+      text,
+      updatedAt: firebase.database.ServerValue.TIMESTAMP,
+      updatedBy: currentUser.uid,
+      updatedByEmail: currentUser.email || ''
+    });
+    const student = teacherStudents.find(item => item.uid === uid);
+    if(student){
+      student.teacherTip = text;
+      student.teacherTipUpdatedAt = Date.now();
+      student.teacherTipUpdatedByEmail = currentUser.email || '';
+    }
+    teacherAdviceMessage = text ? 'Nasihat cikgu berjaya disimpan.' : 'Nasihat cikgu telah dikosongkan.';
+    teacherAdviceMessageType = 'success';
+    playCorrect();
+  }catch(error){
+    console.error('Save teacher advice:',error);
+    teacherAdviceMessage = 'Nasihat tidak dapat disimpan. Semak Database Rules dan sambungan internet.';
+    teacherAdviceMessageType = 'error';
+    playWrong();
+  }finally{
+    teacherAdviceSaving = false;
+    render();
+  }
+}
+
+function detachTeacherTipListener(){
+  if(teacherTipRef && teacherTipHandler){
+    teacherTipRef.off('value',teacherTipHandler);
+  }
+  teacherTipRef = null;
+  teacherTipHandler = null;
+}
+
+function listenTeacherAdvice(uid){
+  detachTeacherTipListener();
+  teacherTipRef = db.ref(`teacherNotes/${uid}`);
+  teacherTipHandler = snapshot => {
+    const note = snapshot.val() || {};
+    state.teacherTip = typeof note.text === 'string' && note.text.trim()
+      ? note.text
+      : 'Belum ada nasihat daripada cikgu.';
+    render();
+  };
+  teacherTipRef.on('value',teacherTipHandler,error => {
+    console.error('Teacher advice listener:',error);
+    state.teacherTip = 'Nasihat cikgu tidak dapat dimuatkan.';
+    render();
+  });
+}
+
+function renderTeacherStudentDetail(student){
+  const stats = student.lifetimeStats || {};
+  const accuracy = studentAccuracy(student);
+  const stars = studentStars(student);
+  const badges = Array.isArray(student.badges) ? student.badges : [];
+  const challenge = student.dailyChallenge || {};
+  return `
+  <div class="slide-up w-full max-w-3xl">
+    <div class="flex items-center justify-between mb-5">
+      <button onclick="closeStudentDetail()" class="btn-bounce px-4 py-3 rounded-xl font-black text-white" style="background:#7C3AED">← Senarai Murid</button>
+      <button onclick="logoutUser()" class="btn-bounce px-4 py-3 rounded-xl font-black text-white" style="background:#DC2626">Log Keluar</button>
+    </div>
+
+    <div class="bg-white rounded-3xl p-6 card-shadow mb-5">
+      <div class="flex items-center gap-4 mb-5">
+        <div class="text-6xl">${escapeHtml(student.studentAvatar || '🎓')}</div>
+        <div class="min-w-0">
+          <h2 class="font-black text-2xl break-words" style="color:#7C3AED">${escapeHtml(student.studentName || 'Pelajar Tanpa Nama')}</h2>
+          <div class="font-semibold text-sm break-all" style="color:#666">${escapeHtml(student.email || 'Tiada e-mel')}</div>
+          <div class="font-bold text-xs mt-1" style="color:#999">Kemaskini: ${formatTeacherDate(student.updatedAt)}</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="p-4 rounded-2xl text-center" style="background:#FFF7ED"><div class="font-black text-2xl" style="color:#F97316">${stars}/4</div><div class="text-xs font-bold">Bintang</div></div>
+        <div class="p-4 rounded-2xl text-center" style="background:#FDF2F8"><div class="font-black text-2xl" style="color:#DB2777">${safeNumber(student.gamePoints)}</div><div class="text-xs font-bold">Mata Permainan</div></div>
+        <div class="p-4 rounded-2xl text-center" style="background:#ECFEFF"><div class="font-black text-2xl" style="color:#0891B2">${accuracy}%</div><div class="text-xs font-bold">Ketepatan</div></div>
+        <div class="p-4 rounded-2xl text-center" style="background:#F0FDF4"><div class="font-black text-2xl" style="color:#16A34A">${badges.length}</div><div class="text-xs font-bold">Badge</div></div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-5">
+      <div class="bg-white rounded-3xl p-5 card-shadow">
+        <h3 class="font-black text-lg mb-4" style="color:#0891B2">📊 Statistik Pembelajaran</h3>
+        <div class="space-y-3 text-sm font-semibold">
+          <div class="flex justify-between"><span>Soalan dijawab</span><strong>${safeNumber(stats.totalQuestionsAnswered)}</strong></div>
+          <div class="flex justify-between"><span>Jawapan betul</span><strong>${safeNumber(stats.correctAnswers)}</strong></div>
+          <div class="flex justify-between"><span>Permainan selesai</span><strong>${safeNumber(stats.gamesCompleted)}</strong></div>
+          <div class="flex justify-between"><span>Jumlah mata</span><strong>${safeNumber(stats.totalPointsEarned)}</strong></div>
+          <div class="flex justify-between"><span>Huruf dipelajari</span><strong>${safeNumber(stats.totalHurufLearned)}/26</strong></div>
+          <div class="flex justify-between"><span>Perkataan dipelajari</span><strong>${safeNumber(stats.totalWordsLearned)}/${PERKATAAN.length}</strong></div>
+          <div class="flex justify-between"><span>Ayat dibaca</span><strong>${safeNumber(stats.totalAyatsRead)}/${AYAT.length}</strong></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-5 card-shadow">
+        <h3 class="font-black text-lg mb-4" style="color:#F97316">🔥 Aktiviti & Cabaran</h3>
+        <div class="space-y-3 text-sm font-semibold">
+          <div class="flex justify-between"><span>Jalur semasa</span><strong>${safeNumber(student.streak)} hari</strong></div>
+          <div class="flex justify-between"><span>Jalur terbaik</span><strong>${safeNumber(student.bestStreak)} hari</strong></div>
+          <div class="flex justify-between"><span>Permainan dimainkan</span><strong>${safeNumber(student.totalGamesPlayed)}</strong></div>
+          <div class="flex justify-between"><span>Cabaran harian</span><strong>${safeNumber(challenge.progress)}/${safeNumber(challenge.target)}</strong></div>
+          <div class="flex justify-between"><span>Status cabaran</span><strong>${challenge.completed?'✅ Selesai':'⏳ Belum selesai'}</strong></div>
+        </div>
+        <div class="mt-5 p-4 rounded-2xl" style="background:#FAF5FF">
+          <div class="font-black text-sm mb-1" style="color:#7C3AED">💡 Nasihat Cikgu</div>
+          <div class="text-xs font-semibold mb-3" style="color:#7C3AED">Nasihat ini akan terus dipaparkan dalam akaun murid.</div>
+          <textarea id="teacher-advice-input" maxlength="500" rows="5" class="w-full p-3 rounded-xl border-2 font-semibold text-sm outline-none resize-y" style="border-color:#C4B5FD;background:white" placeholder="Tulis nasihat untuk murid ini...">${escapeHtml(student.teacherTip || '')}</textarea>
+          <div class="flex items-center justify-between gap-3 mt-2 mb-3">
+            <div class="text-[11px] font-bold" style="color:#777">Maksimum 500 aksara</div>
+            <div class="text-[11px] font-bold text-right" style="color:#777">Kemaskini nasihat: ${formatTeacherDate(student.teacherTipUpdatedAt)}</div>
+          </div>
+          ${teacherAdviceMessage?`<div class="mb-3 p-3 rounded-xl text-sm font-bold" style="background:${teacherAdviceMessageType==='success'?'#DCFCE7':'#FEE2E2'};color:${teacherAdviceMessageType==='success'?'#166534':'#B91C1C'}">${escapeHtml(teacherAdviceMessage)}</div>`:''}
+          <button onclick="saveTeacherAdvice('${student.uid}')" ${teacherAdviceSaving?'disabled':''} class="btn-bounce w-full py-3 rounded-xl font-black text-white disabled:opacity-60" style="background:linear-gradient(135deg,#7C3AED,#4F46E5)">${teacherAdviceSaving?'⏳ Menyimpan...':'💾 Simpan Nasihat Cikgu'}</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-3xl p-5 card-shadow">
+      <h3 class="font-black text-lg mb-4" style="color:#DB2777">🏅 Badge Murid</h3>
+      ${badges.length ? `<div class="grid grid-cols-2 md:grid-cols-3 gap-3">${badges.map(b=>`<div class="p-4 rounded-2xl text-center" style="background:#FDF2F8"><div class="text-3xl mb-2">${escapeHtml(b.icon || '🏅')}</div><div class="font-black text-sm" style="color:#BE185D">${escapeHtml(b.name || 'Badge')}</div></div>`).join('')}</div>` : `<div class="text-center font-semibold p-5 rounded-2xl" style="background:#F3F4F6;color:#6B7280">Murid belum memperoleh badge.</div>`}
+    </div>
+  </div>`;
+}
+
+function renderTeacherDashboard(){
+  const selected = selectedStudentUid ? teacherStudents.find(student => student.uid === selectedStudentUid) : null;
+  if(selected) return renderTeacherStudentDetail(selected);
+
+  const query = teacherSearch.trim().toLowerCase();
+  const filtered = teacherStudents.filter(student => {
+    const haystack = `${student.studentName || ''} ${student.email || ''}`.toLowerCase();
+    return !query || haystack.includes(query);
+  });
+  const totalAnswers = teacherStudents.reduce((sum,student)=>sum+safeNumber(student?.lifetimeStats?.totalQuestionsAnswered),0);
+  const totalCorrect = teacherStudents.reduce((sum,student)=>sum+safeNumber(student?.lifetimeStats?.correctAnswers),0);
+  const overallAccuracy = totalAnswers > 0 ? Math.round((totalCorrect/totalAnswers)*100) : 0;
+  const totalGames = teacherStudents.reduce((sum,student)=>sum+safeNumber(student?.lifetimeStats?.gamesCompleted),0);
+
+  return `
+  <div class="slide-up w-full max-w-4xl">
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl p-5 md:p-6 text-white card-shadow mb-5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <div class="text-4xl mb-2">👩‍🏫📊</div>
+          <h2 class="font-black text-2xl">Dashboard Cikgu</h2>
+          <div class="font-semibold text-sm opacity-90 break-all">${escapeHtml(currentUser?.email || '')}</div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="refreshTeacherData()" class="btn-bounce px-4 py-3 rounded-xl font-black" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5)">↻ Muat Semula</button>
+          <button onclick="logoutUser()" class="btn-bounce px-4 py-3 rounded-xl font-black" style="background:#DC2626">Log Keluar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+      <div class="bg-white p-4 rounded-2xl card-shadow text-center"><div class="font-black text-3xl" style="color:#7C3AED">${teacherStudents.length}</div><div class="text-xs font-bold">Jumlah Murid</div></div>
+      <div class="bg-white p-4 rounded-2xl card-shadow text-center"><div class="font-black text-3xl" style="color:#0891B2">${totalAnswers}</div><div class="text-xs font-bold">Soalan Dijawab</div></div>
+      <div class="bg-white p-4 rounded-2xl card-shadow text-center"><div class="font-black text-3xl" style="color:#16A34A">${overallAccuracy}%</div><div class="text-xs font-bold">Ketepatan Keseluruhan</div></div>
+      <div class="bg-white p-4 rounded-2xl card-shadow text-center"><div class="font-black text-3xl" style="color:#F97316">${totalGames}</div><div class="text-xs font-bold">Permainan Selesai</div></div>
+    </div>
+
+    <div class="bg-white rounded-3xl p-4 md:p-5 card-shadow">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+        <div>
+          <h3 class="font-black text-xl" style="color:#7C3AED">Senarai Murid</h3>
+          <div class="text-xs font-semibold" style="color:#777">Guru boleh melihat data dan mengemas kini nasihat murid.</div>
+        </div>
+        <input id="teacher-search" value="${escapeHtml(teacherSearch)}" oninput="updateTeacherSearch(this.value)" placeholder="Cari nama atau e-mel..." class="w-full md:w-80 p-3 rounded-xl border-2 font-semibold outline-none" style="border-color:#C4B5FD">
+      </div>
+
+      ${teacherError?`<div class="mb-4 p-4 rounded-2xl font-bold" style="background:#FEE2E2;color:#B91C1C">${escapeHtml(teacherError)}</div>`:''}
+      ${teacherLoading?`<div class="text-center p-10"><div class="text-5xl mb-3 float-anim">⏳</div><div class="font-black" style="color:#7C3AED">Memuatkan data murid...</div></div>`:
+        filtered.length?`<div class="space-y-3">${filtered.map(student=>{
+          const accuracy=studentAccuracy(student);
+          return `<div class="p-4 rounded-2xl border-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4" style="border-color:#E9D5FF;background:#FAF5FF">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="text-4xl">${escapeHtml(student.studentAvatar || '🎓')}</div>
+              <div class="min-w-0">
+                <div class="font-black text-lg break-words" style="color:#6D28D9">${escapeHtml(student.studentName || 'Pelajar Tanpa Nama')}</div>
+                <div class="text-xs font-semibold break-all" style="color:#666">${escapeHtml(student.email || 'Tiada e-mel')}</div>
+                <div class="text-xs font-bold mt-1" style="color:#999">Kemaskini: ${formatTeacherDate(student.updatedAt)}</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 md:w-72">
+              <div class="text-center p-2 rounded-xl bg-white"><div class="font-black" style="color:#F97316">${studentStars(student)}/4</div><div class="text-[10px] font-bold">Bintang</div></div>
+              <div class="text-center p-2 rounded-xl bg-white"><div class="font-black" style="color:#DB2777">${safeNumber(student.gamePoints)}</div><div class="text-[10px] font-bold">Mata</div></div>
+              <div class="text-center p-2 rounded-xl bg-white"><div class="font-black" style="color:#0891B2">${accuracy}%</div><div class="text-[10px] font-bold">Tepat</div></div>
+            </div>
+            <button onclick="openStudentDetail('${student.uid}')" class="btn-bounce px-5 py-3 rounded-xl font-black text-white" style="background:linear-gradient(135deg,#7C3AED,#4F46E5)">Lihat Data</button>
+          </div>`;
+        }).join('')}</div>`:
+        `<div class="text-center p-10 rounded-2xl" style="background:#F3F4F6"><div class="text-5xl mb-3">🔎</div><div class="font-black" style="color:#6B7280">${teacherStudents.length?'Tiada murid sepadan dengan carian.':'Belum ada data murid.'}</div></div>`}
+    </div>
+  </div>`;
 }
 
 function renderHome(){
@@ -679,12 +1000,13 @@ function renderProfile(){
       </div>
       <div class="mb-4">
         <label class="font-bold" style="color:#A78BFA">Nasihat Cikgu:</label>
-        <textarea id="teacher-tip" rows="2" class="w-full p-3 rounded-xl border-2 border-gray-300 mt-2 font-semibold text-sm" style="border-color:#A78BFA">${state.teacherTip}</textarea>
+        <div class="w-full p-3 rounded-xl border-2 mt-2 font-semibold text-sm" style="border-color:#A78BFA;background:#FAF5FF;color:#5B21B6">${escapeHtml(state.teacherTip || 'Belum ada nasihat daripada cikgu.')}</div>
+        <div class="text-xs font-semibold mt-2" style="color:#777">Nasihat ini hanya boleh dikemas kini oleh guru.</div>
       </div>
-      <button onclick="playClick();state.studentName=document.getElementById('name-input').value;state.parentNote=document.getElementById('parent-note').value;state.teacherTip=document.getElementById('teacher-tip').value;go('home')" class="btn-bounce w-full py-4 rounded-xl font-bold text-white" style="background:linear-gradient(135deg,#A78BFA,#9370DB);box-shadow:0 6px 20px rgba(167,139,250,0.4)">💾 Simpan</button>
+      <button onclick="playClick();state.studentName=document.getElementById('name-input').value;state.parentNote=document.getElementById('parent-note').value;go('home')" class="btn-bounce w-full py-4 rounded-xl font-bold text-white" style="background:linear-gradient(135deg,#A78BFA,#9370DB);box-shadow:0 6px 20px rgba(167,139,250,0.4)">💾 Simpan</button>
       <div class="mt-6 pt-6" style="border-top:2px dashed #FCA5A5">
         <div class="font-bold mb-2" style="color:#DC2626">⚠️ Zon Bahaya</div>
-        <div class="text-sm font-semibold mb-3" style="color:#666">Tindakan ini akan memadam semua pencapaian, bintang, badge, statistik & cabaran. Nama, avatar, nota ibu-bapa & nasihat cikgu akan DIKEKALKAN.</div>
+        <div class="text-sm font-semibold mb-3" style="color:#666">Tindakan ini akan memadam semua pencapaian, bintang, badge, statistik & cabaran. Nama, avatar, nota ibu-bapa dan nasihat cikgu akan DIKEKALKAN.</div>
         <button data-testid="reset-progress-btn" onclick="resetProgress()" class="btn-bounce w-full py-3 rounded-xl font-bold text-white" style="background:linear-gradient(135deg,#DC2626,#B91C1C);box-shadow:0 6px 20px rgba(220,38,38,0.4)">🗑️ Tetapkan Semula Semua Data</button>
       </div>
     </div>
@@ -1482,7 +1804,7 @@ function go(screen){
 
 // ---- Firebase progress sync ----
 const PROGRESS_KEYS = [
-  'studentName','studentAvatar','parentNote','teacherTip','stars','gamePoints','streak','bestStreak',
+  'studentName','studentAvatar','parentNote','stars','gamePoints','streak','bestStreak',
   'totalGamesPlayed','badges','lifetimeStats','wheelSpinCount','totalHurufLearned','totalAyatsRead',
   'totalWordsLearned','perfectScores','dailyChallenge','lastPlayDate','wordsSeenCount','ayatSeenCount'
 ];
@@ -1532,7 +1854,7 @@ async function loadProgress(){
 }
 
 async function syncNow(){
-  if(!currentUser || !progressLoaded || syncBusy) return;
+  if(!currentUser || currentRole !== 'student' || !progressLoaded || syncBusy) return;
   syncBusy = true;
   try{
     await db.ref(`users/${currentUser.uid}`).update({
@@ -1548,7 +1870,7 @@ async function syncNow(){
 }
 
 function queueSync(){
-  if(!currentUser || !progressLoaded) return;
+  if(!currentUser || currentRole !== 'student' || !progressLoaded) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(syncNow,900);
 }
@@ -1562,15 +1884,37 @@ render = function(){
 
 auth.onAuthStateChanged(async user => {
   clearTimeout(syncTimer);
+  detachTeacherTipListener();
   currentUser = user;
   authReady = true;
   authBusy = false;
   authMessage = '';
   progressLoaded = false;
+  currentRole = 'student';
+  teacherStudents = [];
+  teacherError = '';
+  selectedStudentUid = null;
+  teacherSearch = '';
+  teacherAdviceSaving = false;
+  teacherAdviceMessage = '';
   state = createDefaultState();
 
   if(user){
-    await loadProgress();
+    try{
+      const teacherSnapshot = await db.ref(`roles/teachers/${user.uid}`).once('value');
+      currentRole = teacherSnapshot.val() === true ? 'teacher' : 'student';
+    }catch(error){
+      console.error('Role check:',error);
+      currentRole = 'student';
+    }
+
+    if(currentRole === 'teacher'){
+      render();
+      await loadTeacherStudents();
+    }else{
+      await loadProgress();
+      listenTeacherAdvice(user.uid);
+    }
   }else{
     render();
   }
