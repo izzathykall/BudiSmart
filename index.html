@@ -198,6 +198,7 @@ let syncBusy = false;
 
 // ---- Teacher dashboard state ----
 let currentRole = 'student';
+let roleCheckError = '';
 let teacherStudents = [];
 let teacherLoading = false;
 let teacherError = '';
@@ -574,6 +575,19 @@ function render(){
   }
   if(currentRole === 'teacher'){
     c.innerHTML = renderTeacherDashboard();
+    lucide.createIcons();
+    return;
+  }
+  if(currentRole === 'role-error'){
+    c.innerHTML = `
+      <div class="slide-up w-full max-w-lg mx-auto">
+        <div class="bg-white rounded-3xl p-6 card-shadow text-center">
+          <div class="text-5xl mb-3">⚠️</div>
+          <div class="font-black text-xl mb-2" style="color:#B91C1C">Status akaun tidak dapat disemak</div>
+          <div class="text-sm font-semibold mb-4" style="color:#555">${escapeHtml(roleCheckError || 'Semak Realtime Database Rules dan UID akaun guru.')}</div>
+          <button onclick="logoutUser()" class="btn-bounce w-full py-3 rounded-xl font-black text-white" style="background:#7C3AED">Log Keluar</button>
+        </div>
+      </div>`;
     lucide.createIcons();
     return;
   }
@@ -1891,6 +1905,7 @@ auth.onAuthStateChanged(async user => {
   authMessage = '';
   progressLoaded = false;
   currentRole = 'student';
+  roleCheckError = '';
   teacherStudents = [];
   teacherError = '';
   selectedStudentUid = null;
@@ -1905,7 +1920,8 @@ auth.onAuthStateChanged(async user => {
       currentRole = teacherSnapshot.val() === true ? 'teacher' : 'student';
     }catch(error){
       console.error('Role check:',error);
-      currentRole = 'student';
+      currentRole = 'role-error';
+      roleCheckError = 'Firebase menyekat semakan peranan. Publish Database Rules baharu dan pastikan UID guru berada di roles/teachers dengan nilai Boolean true.';
     }
 
     if(currentRole === 'teacher'){
