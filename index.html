@@ -476,7 +476,11 @@ function renderAuth(){
         </button>
       </form>
 
-      ${!isRegister?`<button onclick="resetPassword()" class="w-full mt-3 text-sm font-bold" style="color:#7C3AED">Lupa kata laluan?</button>`:''}
+      ${!isRegister?`
+      <button onclick="resetPassword()" class="w-full mt-3 text-sm font-bold" style="color:#7C3AED">Lupa kata laluan?</button>
+      <p class="mt-2 text-center text-xs font-semibold" style="color:#777">
+        Gunakan e-mel yang sama seperti dalam akaun BUDI SMART.
+      </p>`:''}
 
       <div class="mt-6 pt-5 text-center" style="border-top:2px dashed #E5E7EB">
         <span class="text-sm font-semibold" style="color:#666">${isRegister?'Sudah mempunyai akaun?':'Belum mempunyai akaun?'}</span>
@@ -520,9 +524,16 @@ function friendlyAuthError(error){
     'auth/wrong-password':'Kata laluan tidak betul.',
     'auth/too-many-requests':'Terlalu banyak cubaan. Cuba lagi kemudian.',
     'auth/network-request-failed':'Sambungan internet bermasalah.',
-    'auth/unauthorized-domain':'Domain GitHub Pages belum ditambah dalam Firebase Authorized domains.'
+    'auth/unauthorized-domain':'Domain GitHub Pages belum ditambah dalam Firebase Authorized domains.',
+    'auth/operation-not-allowed':'Fungsi Email/Password belum diaktifkan dalam Firebase Authentication.',
+    'auth/quota-exceeded':'Had penghantaran e-mel Firebase telah dicapai. Cuba semula kemudian.',
+    'auth/too-many-requests':'Terlalu banyak permintaan. Cuba semula kemudian.',
+    'auth/invalid-continue-uri':'Pautan sambungan tetapan semula kata laluan tidak sah.',
+    'auth/unauthorized-continue-uri':'Domain pautan tetapan semula belum dibenarkan dalam Firebase.',
+    'auth/missing-continue-uri':'Pautan sambungan tetapan semula kata laluan tiada.',
+    'auth/user-disabled':'Akaun ini telah dinyahaktifkan.'
   };
-  return messages[code] || 'Tidak berjaya. Sila semak maklumat dan cuba lagi.';
+  return messages[code] || `Tidak berjaya. Kod ralat: ${code || 'tidak diketahui'}.`;
 }
 
 async function submitAuth(event){
@@ -558,19 +569,32 @@ async function submitAuth(event){
 }
 
 async function resetPassword(){
-  const email = document.getElementById('auth-email')?.value.trim() || authEmailDraft;
+  const emailInput = document.getElementById('auth-email');
+  const email = emailInput?.value.trim() || authEmailDraft;
   authEmailDraft = email;
+
   if(!email){
     authMessageType = 'error';
-    authMessage = 'Masukkan e-mel dahulu.';
+    authMessage = 'Masukkan e-mel akaun BUDI SMART dahulu.';
     render();
     return;
   }
+
+  if(emailInput && !emailInput.checkValidity()){
+    authMessageType = 'error';
+    authMessage = 'Format e-mel tidak sah. Contoh: nama@email.com';
+    render();
+    return;
+  }
+
   try{
+    auth.languageCode = 'ms';
     await auth.sendPasswordResetEmail(email);
     authMessageType = 'success';
-    authMessage = 'Pautan tetapan semula kata laluan telah dihantar ke e-mel.';
+    authMessage = 'Jika e-mel ini berdaftar dalam BUDI SMART, pautan tetapan semula telah dihantar. Semak Inbox, Spam/Junk dan Promotions.';
+    console.info('Permintaan tetapan semula kata laluan berjaya dihantar kepada Firebase untuk:', email);
   }catch(error){
+    console.error('Firebase password reset error:', error);
     authMessageType = 'error';
     authMessage = friendlyAuthError(error);
   }
