@@ -2,10 +2,13 @@
 <html lang="ms" class="h-full">
  <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, inital-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BUDI SMART</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-database-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
   <style>
 *{font-family:'Nunito',sans-serif;box-sizing:border-box}
@@ -166,7 +169,35 @@ const BADGE_SYSTEM = [
 const COLORS = {bg:'#E8F4FD',card:'#FFFFFF',text:'#2D3436',primary:'#FF6B6B',accent:'#4ECDC4'};
 const PASTELS = ['#FF5252','#00E676','#00B0FF','#FFEA00','#D946EF','#FF6E40'];
 
-let state = {
+// ---- Firebase: Authentication + Realtime Database ----
+const firebaseConfig = {
+  apiKey: "AIzaSyCGj8jkYiafxtXmhgnp_fIGLJNRnYV8MQA",
+  authDomain: "budismart-ba0c1.firebaseapp.com",
+  databaseURL: "https://budismart-ba0c1-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "budismart-ba0c1",
+  storageBucket: "budismart-ba0c1.firebasestorage.app",
+  messagingSenderId: "1024110248490",
+  appId: "1:1024110248490:web:97ab782800f468f009b953",
+  measurementId: "G-ZXVD4WH4TT"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+let currentUser = null;
+let authReady = false;
+let progressLoaded = false;
+let authMode = 'login';
+let authBusy = false;
+let authMessage = '';
+let authMessageType = 'error';
+let authEmailDraft = '';
+let syncTimer = null;
+let syncBusy = false;
+
+function createDefaultState(){
+  return {
   screen:'home', hurufIdx:0, sukuIdx:0, perkataanIdx:0, ayatIdx:0,
   stars:[false,false,false,false], gamePoints:0, gameType:null, gameQ:0, gameScore:0, gameTotal:8, gameData:null, gameAnswer:null, gameFeedback:null, usedIndices:[],
   rodaCurrentWord:null, rodaIsSpinning:false,
@@ -174,8 +205,13 @@ let state = {
   dailyChallenge:{completed:false,type:'huruf',target:5,progress:0}, badges:[], lastPlayDate:null,
   parentNote:'Selamat belajar! Teruskan usaha. 💪', teacherTip:'Ingat sebut dengan betul!',
   lifetimeStats:{totalQuestionsAnswered:0,correctAnswers:0,totalPointsEarned:0,gamesCompleted:0,totalHurufLearned:0,totalWordsLearned:0,totalAyatsRead:0,perfectScores:0},
-  wheelSpinCount:0, totalHurufLearned:0, totalAyatsRead:0, totalWordsLearned:0, perfectScores:0
-};
+  wheelSpinCount:0, totalHurufLearned:0, totalAyatsRead:0, totalWordsLearned:0, perfectScores:0,
+  hurufIdsSeen:new Set(), sukuIdsSeen:new Set(), wordsSeen:new Set(), wordsSeenCount:0,
+  ayatSeen:new Set(), ayatSeenCount:0
+  };
+}
+
+let state = createDefaultState();
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -356,8 +392,173 @@ function updateDailyChallenge(){
   }
 }
 
+function escapeHtml(value){
+  return String(value ?? '')
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'",'&#039;');
+}
+
+function renderAuthLoading(){
+  return `
+  <div class="slide-up w-full max-w-lg">
+    <div class="bg-white rounded-3xl p-8 card-shadow text-center">
+      <div class="text-5xl mb-4 float-anim">📚</div>
+      <div class="font-black text-xl" style="color:#FF6B6B">Memuatkan BUDI SMART...</div>
+      <div class="mt-4 h-3 rounded-full overflow-hidden" style="background:#eee">
+        <div class="h-full animate-pulse" style="width:70%;background:linear-gradient(90deg,#FF6B6B,#4ECDC4)"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAuth(){
+  const isRegister = authMode === 'register';
+  const messageColor = authMessageType === 'success' ? '#047857' : '#B91C1C';
+  const messageBg = authMessageType === 'success' ? '#D1FAE5' : '#FEE2E2';
+  return `
+  <div class="slide-up w-full max-w-lg">
+    <div class="bg-white rounded-3xl p-6 md:p-8 card-shadow">
+      <div class="text-center mb-6">
+        <div class="text-6xl mb-3 float-anim">${isRegister?'🧒✨':'🔐📚'}</div>
+        <h2 class="font-black text-2xl mb-2" style="color:#FF6B6B">${isRegister?'Daftar Pengguna':'Log Masuk'}</h2>
+        <p class="text-sm font-semibold" style="color:#666">${isRegister?'Buat akaun untuk menyimpan kemajuan pembelajaran.':'Sambung pembelajaran dan dapatkan semula kemajuan anda.'}</p>
+      </div>
+
+      ${authMessage?`<div class="mb-4 p-3 rounded-xl text-sm font-bold" style="background:${messageBg};color:${messageColor}">${escapeHtml(authMessage)}</div>`:''}
+
+      <form onsubmit="submitAuth(event)" class="space-y-4">
+        <div>
+          <label class="block font-bold text-sm mb-2" style="color:#4ECDC4">E-mel</label>
+          <input id="auth-email" type="email" autocomplete="email" required value="${escapeHtml(authEmailDraft)}"
+            placeholder="contoh@email.com" class="w-full p-3 rounded-xl border-2 font-semibold outline-none" style="border-color:#B2DFDB">
+        </div>
+        <div>
+          <label class="block font-bold text-sm mb-2" style="color:#A78BFA">Kata Laluan</label>
+          <input id="auth-password" type="password" autocomplete="${isRegister?'new-password':'current-password'}" required minlength="6"
+            placeholder="Minimum 6 aksara" class="w-full p-3 rounded-xl border-2 font-semibold outline-none" style="border-color:#DDD6FE">
+        </div>
+        ${isRegister?`
+        <div>
+          <label class="block font-bold text-sm mb-2" style="color:#FFB347">Sahkan Kata Laluan</label>
+          <input id="auth-confirm" type="password" autocomplete="new-password" required minlength="6"
+            placeholder="Taip semula kata laluan" class="w-full p-3 rounded-xl border-2 font-semibold outline-none" style="border-color:#FED7AA">
+        </div>`:''}
+
+        <button type="submit" ${authBusy?'disabled':''} class="btn-bounce w-full py-4 rounded-xl font-black text-white disabled:opacity-60"
+          style="background:linear-gradient(135deg,#FF6B6B,#EC4899);box-shadow:0 6px 20px rgba(236,72,153,0.3)">
+          ${authBusy?'⏳ Sila tunggu...':(isRegister?'✨ Daftar Akaun':'🚀 Log Masuk')}
+        </button>
+      </form>
+
+      ${!isRegister?`<button onclick="resetPassword()" class="w-full mt-3 text-sm font-bold" style="color:#7C3AED">Lupa kata laluan?</button>`:''}
+
+      <div class="mt-6 pt-5 text-center" style="border-top:2px dashed #E5E7EB">
+        <span class="text-sm font-semibold" style="color:#666">${isRegister?'Sudah mempunyai akaun?':'Belum mempunyai akaun?'}</span>
+        <button onclick="switchAuthMode('${isRegister?'login':'register'}')" class="ml-1 text-sm font-black" style="color:#FF6B6B">
+          ${isRegister?'Log masuk':'Daftar sekarang'}
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function switchAuthMode(mode){
+  authMode = mode;
+  authMessage = '';
+  authBusy = false;
+  render();
+}
+
+function friendlyAuthError(error){
+  const code = error?.code || '';
+  const messages = {
+    'auth/email-already-in-use':'E-mel ini sudah didaftarkan. Sila log masuk.',
+    'auth/invalid-email':'Format e-mel tidak sah.',
+    'auth/weak-password':'Kata laluan terlalu lemah. Gunakan sekurang-kurangnya 6 aksara.',
+    'auth/invalid-credential':'E-mel atau kata laluan tidak betul.',
+    'auth/user-not-found':'Akaun tidak dijumpai.',
+    'auth/wrong-password':'Kata laluan tidak betul.',
+    'auth/too-many-requests':'Terlalu banyak cubaan. Cuba lagi kemudian.',
+    'auth/network-request-failed':'Sambungan internet bermasalah.',
+    'auth/unauthorized-domain':'Domain GitHub Pages belum ditambah dalam Firebase Authorized domains.'
+  };
+  return messages[code] || 'Tidak berjaya. Sila semak maklumat dan cuba lagi.';
+}
+
+async function submitAuth(event){
+  event?.preventDefault();
+  if(authBusy) return;
+  const email = document.getElementById('auth-email')?.value.trim() || '';
+  const password = document.getElementById('auth-password')?.value || '';
+  const confirmPassword = document.getElementById('auth-confirm')?.value || '';
+  authEmailDraft = email;
+  authMessage = '';
+
+  if(authMode === 'register' && password !== confirmPassword){
+    authMessage = 'Kata laluan dan pengesahan kata laluan tidak sama.';
+    authMessageType = 'error';
+    render();
+    return;
+  }
+
+  authBusy = true;
+  render();
+  try{
+    if(authMode === 'register'){
+      await auth.createUserWithEmailAndPassword(email,password);
+    }else{
+      await auth.signInWithEmailAndPassword(email,password);
+    }
+  }catch(error){
+    authBusy = false;
+    authMessageType = 'error';
+    authMessage = friendlyAuthError(error);
+    render();
+  }
+}
+
+async function resetPassword(){
+  const email = document.getElementById('auth-email')?.value.trim() || authEmailDraft;
+  authEmailDraft = email;
+  if(!email){
+    authMessageType = 'error';
+    authMessage = 'Masukkan e-mel dahulu.';
+    render();
+    return;
+  }
+  try{
+    await auth.sendPasswordResetEmail(email);
+    authMessageType = 'success';
+    authMessage = 'Pautan tetapan semula kata laluan telah dihantar ke e-mel.';
+  }catch(error){
+    authMessageType = 'error';
+    authMessage = friendlyAuthError(error);
+  }
+  render();
+}
+
+async function logoutUser(){
+  try{
+    await syncNow();
+    progressLoaded = false;
+    await auth.signOut();
+  }catch(error){
+    alert('Log keluar tidak berjaya. Sila cuba lagi.');
+  }
+}
+
 function render(){
   const c=document.getElementById('content');
+  if(!authReady){
+    c.innerHTML=renderAuthLoading();
+    lucide.createIcons();
+    return;
+  }
+  if(!currentUser){
+    c.innerHTML=renderAuth();
+    lucide.createIcons();
+    return;
+  }
   switch(state.screen){
     case 'home': c.innerHTML=renderHome();break;
     case 'profile': c.innerHTML=renderProfile();break;
@@ -390,11 +591,14 @@ function renderHome(){
       <div class="flex items-center gap-2">
         <span class="text-3xl">${state.studentAvatar}</span>
         <div class="text-left">
-          <div class="font-black text-lg" style="color:#FF6B6B">${state.studentName}</div>
-          <div class="text-xs font-bold" style="color:#999">Pelajar Cerdas</div>
+          <div class="font-black text-lg" style="color:#FF6B6B">${escapeHtml(state.studentName)}</div>
+          <div class="text-xs font-bold max-w-48 truncate" title="${escapeHtml(currentUser?.email||'')}" style="color:#999">${escapeHtml(currentUser?.email||'Pelajar Cerdas')}</div>
         </div>
       </div>
-      <button onclick="playClick();go('profile')" class="btn-bounce p-2 rounded-lg" style="background:#F3E5FF;border:2px solid #A78BFA"><i data-lucide="settings" style="color:#A78BFA" width="20" height="20"></i></button>
+      <div class="flex items-center gap-2">
+        <button onclick="playClick();go('profile')" aria-label="Tetapan profil" class="btn-bounce p-2 rounded-lg" style="background:#F3E5FF;border:2px solid #A78BFA"><i data-lucide="settings" style="color:#A78BFA" width="20" height="20"></i></button>
+        <button onclick="playClick();logoutUser()" aria-label="Log keluar" class="btn-bounce p-2 rounded-lg" style="background:#FEE2E2;border:2px solid #F87171"><i data-lucide="log-out" style="color:#DC2626" width="20" height="20"></i></button>
+      </div>
     </div>
 
     <div class="grid grid-cols-2 gap-2 mb-4 px-3">
@@ -1276,45 +1480,103 @@ function go(screen){
   queueSync();
 }
 
-// ---- Backend sync ----
-const BACKEND = (window.location.origin);
-const PROGRESS_KEYS = ['stars','gamePoints','streak','bestStreak','totalGamesPlayed','badges','lifetimeStats',
-  'wheelSpinCount','totalHurufLearned','totalAyatsRead','totalWordsLearned','perfectScores',
-  'studentAvatar','parentNote','teacherTip','dailyChallenge','lastPlayDate'];
-let syncTimer=null, syncBusy=false;
+// ---- Firebase progress sync ----
+const PROGRESS_KEYS = [
+  'studentName','studentAvatar','parentNote','teacherTip','stars','gamePoints','streak','bestStreak',
+  'totalGamesPlayed','badges','lifetimeStats','wheelSpinCount','totalHurufLearned','totalAyatsRead',
+  'totalWordsLearned','perfectScores','dailyChallenge','lastPlayDate','wordsSeenCount','ayatSeenCount'
+];
+const SET_PROGRESS_KEYS = ['hurufIdsSeen','sukuIdsSeen','wordsSeen','ayatSeen'];
+
 function extractProgress(){
-  const o={}; PROGRESS_KEYS.forEach(k=>{ if(state[k]!==undefined) o[k]=state[k]; }); return o;
+  const output = {};
+  PROGRESS_KEYS.forEach(key => {
+    if(state[key] !== undefined) output[key] = state[key];
+  });
+  SET_PROGRESS_KEYS.forEach(key => {
+    output[key] = Array.from(state[key] instanceof Set ? state[key] : []);
+  });
+  // Converts Date objects inside badges to safe ISO strings.
+  return JSON.parse(JSON.stringify(output));
 }
+
+function applyProgress(saved){
+  if(!saved || typeof saved !== 'object') return;
+  PROGRESS_KEYS.forEach(key => {
+    if(saved[key] !== undefined) state[key] = saved[key];
+  });
+  SET_PROGRESS_KEYS.forEach(key => {
+    state[key] = new Set(Array.isArray(saved[key]) ? saved[key] : []);
+  });
+  state.wordsSeenCount = state.wordsSeen.size || Number(saved.wordsSeenCount || 0);
+  state.ayatSeenCount = state.ayatSeen.size || Number(saved.ayatSeenCount || 0);
+}
+
 async function loadProgress(){
+  if(!currentUser) return;
+  progressLoaded = false;
   try{
-    const r=await fetch(BACKEND+'/api/progress',{credentials:'include'});
-    if(!r.ok) return;
-    const data=await r.json();
-    if(data.name) state.studentName=data.name;
-    const p=data.progress||{};
-    PROGRESS_KEYS.forEach(k=>{ if(p[k]!==undefined) state[k]=p[k]; });
-    render();
-  }catch(e){console.warn('loadProgress',e)}
+    const userRef = db.ref(`users/${currentUser.uid}`);
+    const snapshot = await userRef.once('value');
+    if(snapshot.exists()){
+      applyProgress(snapshot.val());
+    }
+    progressLoaded = true;
+    if(!snapshot.exists()) await syncNow();
+  }catch(error){
+    console.error('Firebase loadProgress:', error);
+    progressLoaded = true;
+    alert('Data pengguna tidak dapat dimuatkan. Semak Realtime Database Rules dan sambungan internet.');
+  }
+  render();
 }
+
 async function syncNow(){
-  if(syncBusy) return;
-  syncBusy=true;
+  if(!currentUser || !progressLoaded || syncBusy) return;
+  syncBusy = true;
   try{
-    await fetch(BACKEND+'/api/progress',{method:'PUT',credentials:'include',
-      headers:{'Content-Type':'application/json'},body:JSON.stringify(extractProgress())});
-  }catch(e){console.warn('sync',e)}
-  syncBusy=false;
+    await db.ref(`users/${currentUser.uid}`).update({
+      ...extractProgress(),
+      email: currentUser.email || '',
+      updatedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+  }catch(error){
+    console.error('Firebase sync:', error);
+  }finally{
+    syncBusy = false;
+  }
 }
-function queueSync(){ clearTimeout(syncTimer); syncTimer=setTimeout(syncNow,1200); }
-// Hook render so any state change auto-syncs
-const _origRender=render;
-render=function(){ _origRender(); queueSync(); };
-// Hook save button in profile to sync immediately after name change
-loadProgress();
-window.addEventListener('beforeunload',()=>{
-  try{ navigator.sendBeacon && navigator.sendBeacon(BACKEND+'/api/progress',
-    new Blob([JSON.stringify(extractProgress())],{type:'application/json'})); }catch(e){}
+
+function queueSync(){
+  if(!currentUser || !progressLoaded) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(syncNow,900);
+}
+
+// Any normal screen render schedules a lightweight autosave.
+const _origRender = render;
+render = function(){
+  _origRender();
+  queueSync();
+};
+
+auth.onAuthStateChanged(async user => {
+  clearTimeout(syncTimer);
+  currentUser = user;
+  authReady = true;
+  authBusy = false;
+  authMessage = '';
+  progressLoaded = false;
+  state = createDefaultState();
+
+  if(user){
+    await loadProgress();
+  }else{
+    render();
+  }
 });
+
+window.addEventListener('online',()=>queueSync());
 
 function prevHuruf(){state.hurufIdx=Math.max(0,state.hurufIdx-1);render()}
 function nextHuruf(){state.hurufIdx=Math.min(HURUF.length-1,state.hurufIdx+1);render()}
