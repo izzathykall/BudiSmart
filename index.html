@@ -87,7 +87,7 @@ body { box-sizing: border-box; }
       📚✨
      </div>
      <h1 id="app-title" class="text-4xl md:text-5xl font-black bg-gradient-to-r from-red-500 via-pink-500 to-red-600 bg-clip-text text-transparent animate-pulse" style="">BUDI SMART</h1>
-     <p id="app-subtitle" class="text-base md:text-lg font-extrabold mt-2 animate-pulse" style="color:#4ECDC4">Buku Digital Interaktif Murid Pemulihan</p>
+     <p id="app-subtitle" class="text-lg md:text-xl font-extrabold mt-2 animate-pulse" style="color:#4ECDC4">Buku Digital Interaktif Murid Pemulihan</p>
     </div>
     <div id="content" class="w-full max-w-lg flex-1"></div>
    </div>
@@ -435,7 +435,7 @@ function renderAuth(){
       <div class="text-center mb-6">
         <div class="text-6xl mb-3 float-anim">${isRegister?'🧒✨':'🔐📚'}</div>
         <h2 class="font-black text-2xl mb-2" style="color:#FF6B6B">${isRegister?'Daftar Pengguna':'Log Masuk'}</h2>
-        <p class="text-sm font-semibold" style="color:#666">${isRegister?'Buat akaun untuk menyimpan kemajuan pembelajaran.':'Sambung pembelajaran dan dapatkan semula kemajuan anda.'}</p>
+        <p class="text-sm font-semibold" style="color:#666">${isRegister?'Buat akaun untuk menyimpan kemajuan pembelajaran.':'Sambung pembelajaran anda dan teruskan kemajuan yang telah dicapai.'}</p>
       </div>
 
       ${authMessage?`<div class="mb-4 p-3 rounded-xl text-sm font-bold" style="background:${messageBg};color:${messageColor}">${escapeHtml(authMessage)}</div>`:''}
@@ -444,18 +444,30 @@ function renderAuth(){
         <div>
           <label class="block font-bold text-sm mb-2" style="color:#4ECDC4">E-mel</label>
           <input id="auth-email" type="email" autocomplete="email" required value="${escapeHtml(authEmailDraft)}"
-            placeholder="contoh@email.com" class="w-full p-3 rounded-xl border-2 font-semibold outline-none" style="border-color:#B2DFDB">
+            placeholder="nama@email.com" class="w-full p-3 rounded-xl border-2 font-semibold outline-none" style="border-color:#B2DFDB">
         </div>
         <div>
           <label class="block font-bold text-sm mb-2" style="color:#A78BFA">Kata Laluan</label>
-          <input id="auth-password" type="password" autocomplete="${isRegister?'new-password':'current-password'}" required minlength="6"
-            placeholder="Minimum 6 aksara" class="w-full p-3 rounded-xl border-2 font-semibold outline-none" style="border-color:#DDD6FE">
+          <div class="relative">
+            <input id="auth-password" type="password" autocomplete="${isRegister?'new-password':'current-password'}" required minlength="6"
+              placeholder="Minimum 6 aksara" class="w-full p-3 pr-24 rounded-xl border-2 font-semibold outline-none" style="border-color:#DDD6FE">
+            <button type="button" id="toggle-auth-password"
+              onclick="togglePassword('auth-password','toggle-auth-password')"
+              class="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg text-xs font-black"
+              style="color:#7C3AED;background:#F3E8FF" aria-label="Tunjukkan kata laluan">Tunjuk</button>
+          </div>
         </div>
         ${isRegister?`
         <div>
           <label class="block font-bold text-sm mb-2" style="color:#FFB347">Sahkan Kata Laluan</label>
-          <input id="auth-confirm" type="password" autocomplete="new-password" required minlength="6"
-            placeholder="Taip semula kata laluan" class="w-full p-3 rounded-xl border-2 font-semibold outline-none" style="border-color:#FED7AA">
+          <div class="relative">
+            <input id="auth-confirm" type="password" autocomplete="new-password" required minlength="6"
+              placeholder="Taip semula kata laluan" class="w-full p-3 pr-24 rounded-xl border-2 font-semibold outline-none" style="border-color:#FED7AA">
+            <button type="button" id="toggle-auth-confirm"
+              onclick="togglePassword('auth-confirm','toggle-auth-confirm')"
+              class="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg text-xs font-black"
+              style="color:#C2410C;background:#FFF7ED" aria-label="Tunjukkan pengesahan kata laluan">Tunjuk</button>
+          </div>
         </div>`:''}
 
         <button type="submit" ${authBusy?'disabled':''} class="btn-bounce w-full py-4 rounded-xl font-black text-white disabled:opacity-60"
@@ -481,6 +493,20 @@ function switchAuthMode(mode){
   authMessage = '';
   authBusy = false;
   render();
+}
+
+function togglePassword(inputId,buttonId){
+  const input = document.getElementById(inputId);
+  const button = document.getElementById(buttonId);
+  if(!input || !button) return;
+
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  button.textContent = isHidden ? 'Sorok' : 'Tunjuk';
+  button.setAttribute(
+    'aria-label',
+    isHidden ? 'Sembunyikan kata laluan' : 'Tunjukkan kata laluan'
+  );
 }
 
 function friendlyAuthError(error){
