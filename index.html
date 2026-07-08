@@ -1,0 +1,1331 @@
+<!doctype html>
+<html lang="ms" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, inital-scale=1.0">
+  <title>BUDI SMART</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <style>
+*{font-family:'Nunito',sans-serif;box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0}
+.app-wrap{height:100%;width:100%;overflow-y:auto;overflow-x:hidden}
+@keyframes popIn{0%{transform:scale(0.3) rotate(-10deg);opacity:0}60%{transform:scale(1.15) rotate(2deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes sparkle{0%,100%{opacity:1;transform:scale(1) rotate(0)}50%{opacity:0.4;transform:scale(1.5) rotate(180deg)}}
+@keyframes shake{0%,100%{transform:rotate(0) translateX(0)}25%{transform:rotate(-8deg) translateX(-4px)}75%{transform:rotate(8deg) translateX(4px)}}
+@keyframes slideUp{from{transform:translateY(50px) skewY(2deg);opacity:0}to{transform:translateY(0) skewY(0);opacity:1}}
+@keyframes bounceIn{0%{transform:scale(0) rotate(-20deg)}50%{transform:scale(1.3) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes rainbow{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+@keyframes confetti-fall{0%{transform:translateY(-10px) rotate(0deg) scale(1);opacity:1}100%{transform:translateY(250px) rotate(720deg) scale(0.2);opacity:0}}
+@keyframes firework-burst{0%{transform:translate(0,0) scale(1);opacity:1;filter:brightness(1.5)}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0;filter:brightness(0)}}
+@keyframes pulse-glow{0%{transform:scale(1);box-shadow:0 0 20px rgba(255,215,0,0.8),inset 0 0 20px rgba(255,215,0,0.3)}50%{transform:scale(1.12);box-shadow:0 0 50px rgba(255,215,0,1),inset 0 0 30px rgba(255,215,0,0.5)}100%{transform:scale(1);box-shadow:0 0 20px rgba(255,215,0,0.8),inset 0 0 20px rgba(255,215,0,0.3)}}
+@keyframes celebration-text{0%{transform:translateY(0) scale(0.3) rotateZ(-45deg);opacity:0;filter:blur(10px)}50%{transform:translateY(-30px) scale(1.1) rotateZ(10deg);opacity:1;filter:blur(0)}100%{transform:translateY(-60px) scale(0.8) rotateZ(45deg);opacity:0;filter:blur(5px)}}
+@keyframes glow-pulse{0%{box-shadow:0 0 15px rgba(255,215,0,0.6),0 0 30px rgba(255,69,0,0.3);transform:scale(1)}50%{box-shadow:0 0 40px rgba(255,215,0,1),0 0 60px rgba(255,69,0,0.6),inset 0 0 20px rgba(255,215,0,0.4);transform:scale(1.1)}100%{box-shadow:0 0 15px rgba(255,215,0,0.6),0 0 30px rgba(255,69,0,0.3);transform:scale(1)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg) scale(1.05)}75%{transform:rotate(3deg) scale(1.05)}}
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(255,107,107,0.7)}70%{box-shadow:0 0 0 20px rgba(255,107,107,0)}100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}}
+@keyframes flip-in{0%{transform:rotateY(90deg) scale(0.5);opacity:0}100%{transform:rotateY(0) scale(1);opacity:1}}
+@keyframes spin-wheel{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes spin-wheel-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes spin-wheel-dramatic{from{transform:rotate(0deg) scale(1)}to{transform:rotate(1440deg) scale(1)}}
+@keyframes wobble{0%,100%{transform:scale(1) rotate(0)}25%{transform:scale(1.1) rotate(-5deg)}75%{transform:scale(1.1) rotate(5deg)}}
+@keyframes badge-unlock{0%{transform:scale(0) rotate(-180deg);opacity:0}50%{transform:scale(1.2) rotate(10deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes flame{0%,100%{transform:scaleY(1) scaleX(1)}50%{transform:scaleY(1.1) scaleX(0.95)}}
+.pop-in{animation:popIn 0.4s ease-out}
+.glow-pulse{animation:glow-pulse 0.8s ease-in-out infinite}
+.float-anim{animation:float 2.5s ease-in-out infinite}
+.sparkle{animation:sparkle 1.5s ease-in-out infinite}
+.shake-anim{animation:shake 0.4s ease-in-out}
+.slide-up{animation:slideUp 0.5s ease-out}
+.bounce-in{animation:bounceIn 0.5s ease-out}
+.wiggle{animation:wiggle 0.6s ease-in-out infinite}
+.pulse-ring{animation:pulse-ring 1.5s ease-out infinite}
+.flip-in{animation:flip-in 0.6s cubic-bezier(0.68,-0.55,0.265,1.55)}
+.badge-unlock{animation:badge-unlock 0.6s cubic-bezier(0.34,1.56,0.64,1)}
+.flame{animation:flame 0.3s ease-in-out infinite}
+.btn-bounce:active{transform:scale(0.88)}
+.card-shadow{box-shadow:0 12px 40px rgba(0,0,0,0.12),0 0 0 1px rgba(0,0,0,0.05)}
+.letter-card{font-size:clamp(80px,15vw,140px);line-height:1}
+.word-display{font-size:clamp(28px,5vw,44px)}
+.nav-btn{transition:all 0.25s cubic-bezier(0.4,0,0.2,1);cursor:pointer}
+.nav-btn:hover{transform:scale(1.1) translateY(-2px);filter:brightness(1.1)}
+.nav-btn:active{transform:scale(0.95)}
+.game-option{transition:all 0.2s cubic-bezier(0.4,0,0.2,1);cursor:pointer;position:relative;overflow:hidden}
+.game-option::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);animation:shimmer 0.6s infinite;animation-delay:0.1s}
+@keyframes shimmer{0%{left:-100%}100%{left:100%}}
+.game-option:hover{transform:scale(1.08) translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.15)}
+.game-option:active{transform:scale(0.95)}
+.confetti-piece{position:absolute;width:10px;height:10px;border-radius:2px;animation:confetti-fall 1.5s ease-out forwards;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.firework-burst{position:fixed;pointer-events:none;border-radius:50%;filter:drop-shadow(0 0 10px currentColor)}
+.pulse-glow{animation:pulse-glow 0.6s ease-out}
+.celebration-text{animation:celebration-text 1s cubic-bezier(0.34,1.56,0.64,1) forwards;font-weight:900;text-shadow:3px 3px 0 rgba(0,0,0,0.2),0 0 30px rgba(255,215,0,0.9)}
+.progress-dot{width:10px;height:10px;border-radius:50%;transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+.emoji-img{font-size:clamp(60px,12vw,100px);line-height:1;display:block;text-align:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.1))}
+.suku-kata-part{display:inline-block;padding:10px 18px;margin:4px;border-radius:16px;font-weight:800;font-size:clamp(24px,5vw,40px);box-shadow:0 4px 12px rgba(0,0,0,0.1);transition:all 0.2s;transform-origin:center}
+.roda-container{position:relative;width:280px;height:280px;margin:0 auto}
+.roda-wheel{width:100%;height:100%;border-radius:50%;background:conic-gradient(from 0deg, #FF5252 0deg, #00E676 60deg, #00B0FF 120deg, #FFEA00 180deg, #D946EF 240deg, #FF6E40 300deg, #FF5252 360deg);box-shadow:0 0 50px rgba(0,0,0,0.25),inset 0 -8px 25px rgba(0,0,0,0.15),inset 0 8px 25px rgba(255,255,255,0.4);position:relative;transition:transform 0.05s linear;border:10px solid #ffffff;filter:drop-shadow(0 8px 15px rgba(0,0,0,0.2))}
+.roda-wheel::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40%;height:40%;background:radial-gradient(circle,#fff 0%,#f0f0f0 100%);border-radius:50%;box-shadow:inset 0 2px 8px rgba(0,0,0,0.2)}
+.roda-pointer{position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:25px solid #FF6B6B;z-index:10;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))}
+.roda-button{padding:16px 40px;border-radius:20px;font-weight:900;font-size:18px;transition:all 0.2s;box-shadow:0 6px 20px rgba(0,0,0,0.15);border:none;cursor:pointer}
+.roda-button:hover{transform:scale(1.05);box-shadow:0 8px 25px rgba(0,0,0,0.2)}
+.roda-button:active{transform:scale(0.95)}
+.roda-spinning .roda-wheel{animation:spin-wheel-dramatic 3.6s cubic-bezier(0.25,0.46,0.45,0.94) forwards}
+.roda-word-display{font-size:clamp(40px,8vw,60px);font-weight:900;margin:20px 0;color:#EC4899;text-shadow:0 4px 12px rgba(236,72,153,0.3)}
+.roda-word-item{padding:12px 24px;margin:6px;border-radius:16px;font-weight:800;font-size:clamp(28px,5vw,44px);background:linear-gradient(135deg,#FFB3BA,#FF69B4);color:white;box-shadow:0 4px 12px rgba(255,107,107,0.3);display:inline-block}
+body { box-sizing: border-box; }
+  </style>
+ </head>
+ <body class="h-full">
+  <div class="app-wrap" id="app" style="background:linear-gradient(135deg,#E8F4FD 0%,#FFF8E1 50%,#FCE4EC 100%)">
+   <div id="main-container" class="w-full min-h-full flex flex-col items-center px-4 py-6">
+    <div id="header" class="text-center mb-6 pop-in w-full max-w-lg">
+     <div class="text-5xl mb-2 float-anim wiggle">
+      📚✨
+     </div>
+     <h1 id="app-title" class="text-4xl md:text-5xl font-black bg-gradient-to-r from-red-500 via-pink-500 to-red-600 bg-clip-text text-transparent animate-pulse" style="">BUDI SMART</h1>
+     <p id="app-subtitle" class="text-base md:text-lg font-extrabold mt-2 animate-pulse" style="color:#4ECDC4">Buku Digital Interaktif Murid Pemulihan</p>
+    </div>
+    <div id="content" class="w-full max-w-lg flex-1"></div>
+   </div>
+  </div>
+  <script>
+const HURUF = [
+  {h:'A',k:'a',p:'ayam',e:'🐔'},{h:'B',k:'b',p:'bola',e:'⚽'},{h:'C',k:'c',p:'cawan',e:'☕'},
+  {h:'D',k:'d',p:'dadu',e:'🎲'},{h:'E',k:'e',p:'emak',e:'👩'},{h:'F',k:'f',p:'feri',e:'⛴️'},
+  {h:'G',k:'g',p:'gigi',e:'🦷'},{h:'H',k:'h',p:'harimau',e:'🐯'},{h:'I',k:'i',p:'ikan',e:'🐟'},
+  {h:'J',k:'j',p:'jari',e:'👆'},{h:'K',k:'k',p:'kaki',e:'🦶'},{h:'L',k:'l',p:'lori',e:'🚛'},
+  {h:'M',k:'m',p:'mata',e:'👁️'},{h:'N',k:'n',p:'nasi',e:'🍚'},{h:'O',k:'o',p:'oren',e:'🍊'},
+  {h:'P',k:'p',p:'pokok',e:'🌳'},{h:'Q',k:'q',p:'quran',e:'📖'},{h:'R',k:'r',p:'roti',e:'🍞'},
+  {h:'S',k:'s',p:'susu',e:'🥛'},{h:'T',k:'t',p:'tali',e:'🪢'},{h:'U',k:'u',p:'ular',e:'🐍'},
+  {h:'V',k:'v',p:'van',e:'🚐'},{h:'W',k:'w',p:'wau',e:'🪁'},{h:'X',k:'x',p:'x-ray',e:'🩻'},
+  {h:'Y',k:'y',p:'yoyo',e:'🪀'},{h:'Z',k:'z',p:'zip',e:'🤐'}
+];
+
+const SUKUKATA = [
+  {s1:'ba',s2:'ju',p:'baju',e:'👕'},{s1:'bu',s2:'ku',p:'buku',e:'📘'},
+  {s1:'ka',s2:'ki',p:'kaki',e:'🦶'},{s1:'su',s2:'su',p:'susu',e:'🥛'},{s1:'ro',s2:'ti',p:'roti',e:'🍞'},
+  {s1:'ja',s2:'ri',p:'jari',e:'👆'},{s1:'ma',s2:'ta',p:'mata',e:'👁️'},{s1:'gu',s2:'ru',p:'guru',e:'👨‍🏫'},
+  {s1:'to',s2:'pi',p:'topi',e:'🧢'},{s1:'ku',s2:'da',p:'kuda',e:'🐴'},
+  {s1:'ta',s2:'li',p:'tali',e:'🪢'},{s1:'pa',s2:'ku',p:'paku',e:'🔩'},{s1:'da',s2:'du',p:'dadu',e:'🎲'},
+  {s1:'na',s2:'si',p:'nasi',e:'🍚'},{s1:'ko',s2:'pi',p:'kopi',e:'☕'},{s1:'o',s2:'ren',p:'oren',e:'🍊'},
+  {s1:'e',s2:'pal',p:'epal',e:'🍎'},{s1:'i',s2:'kan',p:'ikan',e:'🐟'},
+  {s1:'ha',s2:'ri',p:'hari',e:'📅'},{s1:'fe',s2:'ri',p:'feri',e:'⛴️'},{s1:'pi',s2:'pi',p:'pipi',e:'😊'},
+  {s1:'si',s2:'ku',p:'siku',e:'💪'},{s1:'gu',s2:'li',p:'guli',e:'🔵'},{s1:'li',s2:'ma',p:'lima',e:'🖐️'},
+  {s1:'da',s2:'hi',p:'dahi',e:'🤕'},{s1:'ru',s2:'mah',p:'rumah',e:'🏠'},{s1:'sa',s2:'bun',p:'sabun',e:'🧼'},
+  {s1:'ka',s2:'sut',p:'kasut',e:'👟'},{s1:'ge',s2:'las',p:'gelas',e:'🥤'},{s1:'bo',s2:'tol',p:'botol',e:'🍾'},
+  {s1:'pe',s2:'ti',p:'peti',e:'📦'},{s1:'bal',s2:'di',p:'baldi',e:'🪣'},{s1:'bu',s2:'nga',p:'bunga',e:'🌸'},
+  {s1:'ku',s2:'cing',p:'kucing',e:'🐱'},{s1:'hi',s2:'dung',p:'hidung',e:'👃'},{s1:'gi',s2:'gi',p:'gigi',e:'🦷'}
+];
+
+const PERKATAAN = [
+  {p:'emak',e:'👩'},{p:'bapa',e:'👨'},
+  {p:'abang',e:'👦'},{p:'bayi',e:'👶'},{p:'bola',e:'⚽'},{p:'buku',e:'📘'},
+  {p:'baju',e:'👕'},{p:'beg',e:'💼'},{p:'kerusi',e:'🪑'},{p:'pintu',e:'🚪'},
+  {p:'tingkap',e:'🪟'},{p:'sekolah',e:'🏫'},{p:'cikgu',e:'👨‍🏫'},
+  {p:'pensel',e:'✏️'},{p:'kasut',e:'👟'},{p:'stokin',e:'🧦'},
+  {p:'topi',e:'🧢'},{p:'roti',e:'🍞'},{p:'susu',e:'🥛'},{p:'nasi',e:'🍚'},
+  {p:'ikan',e:'🐟'},{p:'ayam',e:'🐔'},{p:'epal',e:'🍎'},{p:'oren',e:'🍊'},{p:'gula',e:'🍬'},
+  {p:'garam',e:'🧂'},{p:'sudu',e:'🥄'},{p:'cawan',e:'☕'},{p:'pinggan',e:'🍽️'},{p:'mata',e:'👁️'},
+  {p:'gigi',e:'🦷'},{p:'kaki',e:'🦶'},{p:'tangan',e:'🤚'},{p:'hidung',e:'👃'},{p:'mulut',e:'👄'},
+  {p:'telinga',e:'👂'},{p:'rambut',e:'💇'},{p:'rumah',e:'🏠'},{p:'pokok',e:'🌳'},
+  {p:'jalan',e:'🛣️'},{p:'lori',e:'🚛'},{p:'kereta',e:'🚗'},{p:'bas',e:'🚌'},{p:'van',e:'🚐'},
+  {p:'kedai',e:'🏪'},{p:'wau',e:'🪁'},{p:'yoyo',e:'🪀'},{p:'zip',e:'🤐'},
+  {p:'dadu',e:'🎲'},{p:'kuku',e:'💅🏼'},{p:'tali',e:'🪢'},{p:'kuda',e:'🐴'},{p:'feri',e:'⛴️'},
+  {p:'jari',e:'👆'}
+];
+
+const AYAT = [
+  'Ini bola Ali.','Ibu ada baju.','Abu suka susu.','Ini buku saya.','Itu meja Ani.',
+  'Ali ada bola.','Ibu bawa beg.','Adik makan roti.','Kakak baca buku.','Bapa minum kopi.',
+  'Saya ada pensel.','Ini rumah saya.','Amin suka ayam.','Siti ada beg.','Ini kaki saya.',
+  'Itu cawan ibu.','Adik minum susu.','Ali pergi sekolah.','Baju itu cantik.','Buku ini biru.',
+  'Emak masak nasi.','Ayah pandu kereta.','Abang pakai topi.','Kakak ada kasut.','Ini meja guru.',
+  'Murid duduk diam.','Saya suka ikan.','Adik ada buku.','Bola itu besar.','Rumah saya cantik.',
+  'Ini pintu kelas.','Itu tingkap rumah.','Saya pegang sudu.','Ibu beli oren.','Bapa baca surat.',
+  'Ali bawa beg.','Siti pakai baju.','Abu ada kaki luka.','Adik gosok gigi.','Saya basuh tangan.',
+  'Ini hidung saya.','Itu mulut adik.','Kakak sikat rambut.','Emak beli ikan.','Ayah minum susu.',
+  'Ini cawan biru.','Itu pinggan merah.','Saya nampak bas.','Lori itu besar.','Van itu putih.',
+  'Kuda itu lari.','Burung itu kecil.','Ikan itu hidup.','Ayam itu makan.','Saya pergi zoo.',
+  'Ini yoyo Ali.','Zip beg rosak.','Guru masuk kelas.','Murid baca ayat.','Ali tulis nama.','Siti lukis bunga.'
+];
+
+const BADGE_SYSTEM = [
+  {id:'first_huruf',name:'Pembaca Huruf',desc:'Pelajari 5 huruf',icon:'📖',condition:()=>state.stars[0]},
+  {id:'huruf_master',name:'Tuan Huruf',desc:'Kenal semua 26 huruf',icon:'🔤',condition:()=>state.totalHurufLearned>=26},
+  {id:'suku_learner',name:'Penggemar Suku Kata',desc:'Pelajari suku kata',icon:'🎓',condition:()=>state.stars[1]},
+  {id:'reader',name:'Pembaca Kecil',desc:'Baca 10 ayat',icon:'📚',condition:()=>state.totalAyatsRead>=10},
+  {id:'game_starter',name:'Pemain Baru',desc:'Selesai 1 permainan',icon:'🎮',condition:()=>state.totalGamesPlayed>=1},
+  {id:'game_master',name:'Juara Permainan',desc:'Kumpul 50 mata permainan',icon:'🏆',condition:()=>state.gamePoints>=50},
+  {id:'streak_fire',name:'Api Pembelajaran',desc:'7 hari berturut-turut belajar',icon:'🔥',condition:()=>state.streak>=7},
+  {id:'perfect_score',name:'Sempurna!',desc:'Jawab 5 soalan dengan betul',icon:'⭐',condition:()=>state.perfectScores>=1},
+  {id:'vocab_expert',name:'Pakar Perbendaharaan',desc:'Dengar 50 perkataan',icon:'💬',condition:()=>state.totalWordsLearned>=50},
+  {id:'wheel_spinner',name:'Pemutir Roda',desc:'Mainkan roda impian 3 kali',icon:'🎡',condition:()=>state.wheelSpinCount>=3}
+];
+
+const COLORS = {bg:'#E8F4FD',card:'#FFFFFF',text:'#2D3436',primary:'#FF6B6B',accent:'#4ECDC4'};
+const PASTELS = ['#FF5252','#00E676','#00B0FF','#FFEA00','#D946EF','#FF6E40'];
+
+let state = {
+  screen:'home', hurufIdx:0, sukuIdx:0, perkataanIdx:0, ayatIdx:0,
+  stars:[false,false,false,false], gamePoints:0, gameType:null, gameQ:0, gameScore:0, gameTotal:8, gameData:null, gameAnswer:null, gameFeedback:null, usedIndices:[],
+  rodaCurrentWord:null, rodaIsSpinning:false,
+  studentName:'Pelajar Cerdas', studentAvatar:'🎓', difficulty:'medium', streak:0, bestStreak:0, totalGamesPlayed:0, 
+  dailyChallenge:{completed:false,type:'huruf',target:5,progress:0}, badges:[], lastPlayDate:null,
+  parentNote:'Selamat belajar! Teruskan usaha. 💪', teacherTip:'Ingat sebut dengan betul!',
+  lifetimeStats:{totalQuestionsAnswered:0,correctAnswers:0,totalPointsEarned:0,gamesCompleted:0,totalHurufLearned:0,totalWordsLearned:0,totalAyatsRead:0,perfectScores:0},
+  wheelSpinCount:0, totalHurufLearned:0, totalAyatsRead:0, totalWordsLearned:0, perfectScores:0
+};
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function speak(text) {
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='ms-MY'; u.rate=0.75; u.pitch=1.1;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+function playTone(freq,dur){
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.type='sine';o.frequency.value=freq;
+  g.gain.setValueAtTime(0.15,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+  o.start();o.stop(audioCtx.currentTime+dur);
+}
+
+function playCorrect(){playTone(523,0.1);setTimeout(()=>playTone(659,0.1),100);setTimeout(()=>playTone(784,0.2),200)}
+function playWrong(){playTone(300,0.2);setTimeout(()=>playTone(250,0.3),200)}
+function playClick(){playTone(600,0.08)}
+function playCelebration(){
+  const celebrationTone=()=>{
+    playTone(523,0.15);  
+    setTimeout(()=>playTone(659,0.15),180);  
+    setTimeout(()=>playTone(784,0.25),360);  
+  };
+  
+  const celebrationTone2=()=>{
+    playTone(587,0.12);  
+    setTimeout(()=>playTone(698,0.12),160);  
+    setTimeout(()=>playTone(880,0.20),320);  
+  };
+  
+  for(let i=0;i<4;i++){
+    if(i%2===0){
+      setTimeout(celebrationTone,i*700);
+    }else{
+      setTimeout(celebrationTone2,i*700);
+    }
+  }
+}
+
+function showConfetti(el){
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.cssText=`left:${Math.random()*100}%;top:0;background:${PASTELS[Math.floor(Math.random()*PASTELS.length)]};animation-delay:${Math.random()*0.5}s;animation-duration:${1+Math.random()}s`;
+    el.appendChild(p);
+    setTimeout(()=>p.remove(),2000);
+  }
+}
+
+function createFireworks(){
+  const colors=['#FFD700','#FFA500','#FF1744','#4ECDC4','#A78BFA'];
+  const waves=10;
+  const waveDuration=4000;
+  const waveInterval=waveDuration/waves;
+  
+  for(let w=0;w<waves;w++){
+    setTimeout(()=>{
+      const burstPoint={
+        x:Math.random()*window.innerWidth,
+        y:Math.random()*window.innerHeight
+      };
+      
+      for(let i=0;i<80;i++){
+        const p=document.createElement('div');
+        p.className='firework-burst';
+        const angle=(i/80)*Math.PI*2;
+        const dist=150+Math.random()*300;
+        const tx=Math.cos(angle)*dist;
+        const ty=Math.sin(angle)*dist;
+        p.style.cssText=`
+          left:${burstPoint.x}px;
+          top:${burstPoint.y}px;
+          width:24px;
+          height:24px;
+          font-size:24px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          --tx:${tx}px;
+          --ty:${ty}px;
+          animation:firework-burst ${1+Math.random()*0.6}s ease-out forwards;
+          animation-delay:${Math.random()*0.3}s;
+          border-radius:50%;
+        `;
+        p.textContent='⭐';
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),3000);
+      }
+
+    },w*waveInterval);
+  }
+}
+
+function showSmallFireworks(){
+  const colors=['#FFD700','#FFA500','#FF1744','#4ECDC4','#A78BFA'];
+  
+  const burstPoint={
+    x:window.innerWidth/2,
+    y:window.innerHeight/2
+  };
+  
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');
+    p.className='firework-burst';
+    const angle=(i/40)*Math.PI*2;
+    const dist=100+Math.random()*200;
+    const tx=Math.cos(angle)*dist;
+    const ty=Math.sin(angle)*dist;
+    p.style.cssText=`
+      left:${burstPoint.x}px;
+      top:${burstPoint.y}px;
+      width:15px;
+      height:15px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:50%;
+      --tx:${tx}px;
+      --ty:${ty}px;
+      animation:firework-burst 0.8s ease-out forwards;
+      animation-delay:${Math.random()*0.2}s;
+      box-shadow:0 0 12px currentColor;
+    `;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),1500);
+  }
+}
+
+function showCelebration(){
+  playCelebration();
+}
+
+function checkAndUnlockBadges(){
+  const newBadges = BADGE_SYSTEM.filter(b => b.condition() && !state.badges.find(bd => bd.id === b.id));
+  newBadges.forEach((b, idx) => {
+    state.badges.push({id:b.id,name:b.name,icon:b.icon,unlockedAt:new Date()});
+    setTimeout(() => showBadgeUnlock(b), idx * 800);
+  });
+}
+
+function showBadgeUnlock(badge){
+  const popup=document.createElement('div');
+  popup.style.cssText=`
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    padding:30px 40px;
+    border-radius:20px;
+    text-align:center;
+    z-index:9999;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    animation:badge-unlock 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  `;
+  popup.innerHTML=`
+    <div style="font-size:60px;margin-bottom:10px">${badge.icon}</div>
+    <div style="font-size:24px;font-weight:900;color:white;text-shadow:2px 2px 4px rgba(0,0,0,0.2)">Badge Baru!</div>
+    <div style="font-size:18px;font-weight:700;color:white;margin-top:8px">${badge.name}</div>
+  `;
+  document.body.appendChild(popup);
+  playCorrect();
+  setTimeout(()=>popup.remove(),3000);
+}
+
+function updateDailyChallenge(){
+  const today=new Date().toDateString();
+  if(state.lastPlayDate!==today){
+    state.lastPlayDate=today;
+    state.streak++;
+    state.bestStreak=Math.max(state.bestStreak,state.streak);
+    state.dailyChallenge={completed:false,type:['huruf','sukukata','perkataan','ayat'][Math.floor(Math.random()*4)],target:10,progress:0};
+  }
+}
+
+function render(){
+  const c=document.getElementById('content');
+  switch(state.screen){
+    case 'home': c.innerHTML=renderHome();break;
+    case 'profile': c.innerHTML=renderProfile();break;
+    case 'huruf': c.innerHTML=renderHuruf();break;
+    case 'sukukata': c.innerHTML=renderSukukata();break;
+    case 'perkataan': c.innerHTML=renderPerkataan();break;
+    case 'ayat': c.innerHTML=renderAyat();break;
+    case 'game': c.innerHTML=renderGameMenu();break;
+    case 'playing': c.innerHTML=renderPlaying();break;
+    case 'gameResult': c.innerHTML=renderGameResult();break;
+    case 'rodaImpian': c.innerHTML=renderRodaImpian();break;
+    case 'ganjaran': c.innerHTML=renderGanjaran();break;
+    case 'badges': c.innerHTML=renderBadges();break;
+    case 'stats': c.innerHTML=renderStats();break;
+    case 'dailyChallenge': c.innerHTML=renderDailyChallenge();break;
+    case 'info': c.innerHTML=renderInfo();break;
+  }
+  lucide.createIcons();
+}
+
+function renderHome(){
+  updateDailyChallenge();
+  const total=state.stars.filter(Boolean).length;
+  const gamePercent=Math.min(Math.round((state.gamePoints/50)*100),100);
+  const allStarsEarned=total===4;
+  const streakFlame=state.streak>0?'🔥':'';
+  return `
+  <div class="slide-up w-full max-w-2xl">
+    <div class="mb-3 flex items-center justify-between px-3">
+      <div class="flex items-center gap-2">
+        <span class="text-3xl">${state.studentAvatar}</span>
+        <div class="text-left">
+          <div class="font-black text-lg" style="color:#FF6B6B">${state.studentName}</div>
+          <div class="text-xs font-bold" style="color:#999">Pelajar Cerdas</div>
+        </div>
+      </div>
+      <button onclick="playClick();go('profile')" class="btn-bounce p-2 rounded-lg" style="background:#F3E5FF;border:2px solid #A78BFA"><i data-lucide="settings" style="color:#A78BFA" width="20" height="20"></i></button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mb-4 px-3">
+      <div class="p-3 bg-white rounded-2xl card-shadow text-center">
+        <div class="font-bold text-xs" style="color:#4ECDC4">Jalur Pembelajaran</div>
+        <div class="font-black text-2xl" style="color:#4ECDC4">${state.streak}</div>
+        <div class="text-xs font-semibold" style="color:#666">${streakFlame} Hari Berturut-turut</div>
+      </div>
+      <div class="p-3 bg-white rounded-2xl card-shadow text-center">
+        <div class="font-bold text-xs" style="color:#FFA500">Permainan Dimainkan</div>
+        <div class="font-black text-2xl" style="color:#FFA500">${state.totalGamesPlayed}</div>
+        <div class="text-xs font-semibold" style="color:#666">Kali</div>
+      </div>
+    </div>
+
+    <div class="mb-6 p-4 bg-white rounded-3xl card-shadow">
+      <div class="mb-3 flex items-center justify-between">
+        <span class="font-bold" style="color:#FFB347">Bintang Dikumpul</span>
+        <span class="font-bold text-lg" style="color:#FFB347">${total}/4</span>
+      </div>
+      <div class="flex-1 h-6 rounded-full overflow-hidden" style="background:#eee"><div class="h-full rounded-full transition-all flex items-center justify-center" style="width:${(total/4)*100}%;background:linear-gradient(90deg,#FFD700,#FFA500)"><span class="text-white font-bold text-sm" style="text-shadow:0 1px 2px rgba(0,0,0,0.2)">${Math.round((total/4)*100)}%</span></div></div>
+    </div>
+    <div class="mb-6 p-4 bg-white rounded-3xl card-shadow">
+      <div class="mb-3 flex items-center justify-between">
+        <span class="font-bold" style="color:#FF1744">Mata Permainan</span>
+        <span class="font-bold text-lg" style="color:#FF1744">${state.gamePoints}/50</span>
+      </div>
+      <div class="flex-1 h-6 rounded-full overflow-hidden" style="background:#eee"><div class="h-full rounded-full transition-all flex items-center justify-center" style="width:${gamePercent}%;background:linear-gradient(90deg,#FF1744,#FF69B4)"><span class="text-white font-bold text-sm" style="text-shadow:0 1px 2px rgba(0,0,0,0.2)">${gamePercent}%</span></div></div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 mb-6">
+      ${miniMenuBtn('📖','Kenali Huruf','huruf','#FF6B6B','#FFE5E5',0)}
+      ${miniMenuBtn('🔤','Suku Kata','sukukata','#4ECDC4','#D4F5F0',0.08)}
+      ${miniMenuBtn('📝','Perkataan','perkataan','#FFB347','#FFF3E0',0.16)}
+      ${miniMenuBtn('💬','Ayat','ayat','#A78BFA','#F3E5FF',0.24)}
+      ${miniMenuBtn('🎮','Permainan','game','#FF1744','#FFE5E5',0.32)}
+      ${miniMenuBtn('⭐','Ganjaran','ganjaran','#FFD600','#FFFDE7',0.40,allStarsEarned)}
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <button onclick="playClick();go('badges')" class="btn-bounce p-4 rounded-2xl card-shadow font-bold text-white flex flex-col items-center justify-center gap-2 bounce-in" style="background:linear-gradient(135deg,#EC4899,#BE185D);box-shadow:0 8px 20px rgba(236,72,153,0.3);animation-delay:0.48s">
+        <span class="text-3xl">🏅</span>
+        <span class="text-xs">Badges</span>
+      </button>
+      <button onclick="playClick();go('stats')" class="btn-bounce p-4 rounded-2xl card-shadow font-bold text-white flex flex-col items-center justify-center gap-2 bounce-in" style="background:linear-gradient(135deg,#00BCD4,#0097A7);box-shadow:0 8px 20px rgba(0,188,212,0.3);animation-delay:0.52s">
+        <span class="text-3xl">📊</span>
+        <span class="text-xs">Statistik</span>
+      </button>
+      <button onclick="playClick();go('dailyChallenge')" class="btn-bounce p-4 rounded-2xl card-shadow font-bold text-white flex flex-col items-center justify-center gap-2 bounce-in" style="background:linear-gradient(135deg,#FFB347,#FF9800);box-shadow:0 8px 20px rgba(255,179,71,0.3);animation-delay:0.56s">
+        <span class="text-3xl">📅</span>
+        <span class="text-xs">Cabaran</span>
+      </button>
+      <button onclick="playClick();go('info')" class="btn-bounce p-4 rounded-2xl card-shadow font-bold text-white flex flex-col items-center justify-center gap-2 bounce-in" style="background:linear-gradient(135deg,#00BCD4,#0097A7);box-shadow:0 8px 20px rgba(0,188,212,0.3);animation-delay:0.60s">
+        <span class="text-3xl">ℹ️</span>
+        <span class="text-xs">Tentang</span>
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderProfile(){
+  const avatars=['🎓','😊','🤓','👦','👧','🧒','💪','🌟','🎉','🚀'];
+  return `
+  <div class="slide-up w-full max-w-2xl">
+    ${navBar('👤 Profil Pelajar','#A78BFA')}
+    <div class="bg-white rounded-3xl p-6 card-shadow mb-4">
+      <div class="text-center mb-6">
+        <div class="text-6xl mb-3 pop-in" id="avatar-display">${state.studentAvatar}</div>
+        <input id="name-input" type="text" value="${state.studentName}" placeholder="Nama Pelajar" class="w-full p-3 rounded-xl border-2 border-gray-300 font-bold text-center text-lg mb-4" style="border-color:#A78BFA">
+        <div class="font-bold text-sm mb-2" style="color:#A78BFA">Pilih Avatar:</div>
+        <div class="grid grid-cols-5 gap-2 mb-4">
+          ${avatars.map(a=>`<button onclick="playClick();state.studentAvatar='${a}';document.getElementById('avatar-display').textContent='${a}';document.getElementById('avatar-display').classList.add('pop-in')" class="btn-bounce text-3xl p-2 rounded-lg border-3 ${state.studentAvatar===a?'border-purple-500':'border-gray-300'}">${a}</button>`).join('')}
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="font-bold" style="color:#A78BFA">Nota Ibu/Bapa:</label>
+        <textarea id="parent-note" rows="3" class="w-full p-3 rounded-xl border-2 border-gray-300 mt-2 font-semibold text-sm" style="border-color:#A78BFA">${state.parentNote}</textarea>
+      </div>
+      <div class="mb-4">
+        <label class="font-bold" style="color:#A78BFA">Nasihat Cikgu:</label>
+        <textarea id="teacher-tip" rows="2" class="w-full p-3 rounded-xl border-2 border-gray-300 mt-2 font-semibold text-sm" style="border-color:#A78BFA">${state.teacherTip}</textarea>
+      </div>
+      <button onclick="playClick();state.studentName=document.getElementById('name-input').value;state.parentNote=document.getElementById('parent-note').value;state.teacherTip=document.getElementById('teacher-tip').value;go('home')" class="btn-bounce w-full py-4 rounded-xl font-bold text-white" style="background:linear-gradient(135deg,#A78BFA,#9370DB);box-shadow:0 6px 20px rgba(167,139,250,0.4)">💾 Simpan</button>
+      <div class="mt-6 pt-6" style="border-top:2px dashed #FCA5A5">
+        <div class="font-bold mb-2" style="color:#DC2626">⚠️ Zon Bahaya</div>
+        <div class="text-sm font-semibold mb-3" style="color:#666">Tindakan ini akan memadam semua pencapaian, bintang, badge, statistik & cabaran. Nama, avatar, nota ibu-bapa & nasihat cikgu akan DIKEKALKAN.</div>
+        <button data-testid="reset-progress-btn" onclick="resetProgress()" class="btn-bounce w-full py-3 rounded-xl font-bold text-white" style="background:linear-gradient(135deg,#DC2626,#B91C1C);box-shadow:0 6px 20px rgba(220,38,38,0.4)">🗑️ Tetapkan Semula Semua Data</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function resetProgress(){
+  if(!confirm('Adakah anda pasti ingin tetapkan semula semua data? Bintang, mata, badge & statistik akan dipadam. Profil anda akan dikekalkan.')) return;
+  playWrong();
+  // Save profile fields
+  const keep = {
+    studentName: state.studentName,
+    studentAvatar: state.studentAvatar,
+    parentNote: state.parentNote,
+    teacherTip: state.teacherTip,
+  };
+  // Reset progress fields
+  state.stars=[false,false,false,false];
+  state.gamePoints=0;
+  state.streak=0;
+  state.bestStreak=0;
+  state.totalGamesPlayed=0;
+  state.badges=[];
+  state.lifetimeStats={totalQuestionsAnswered:0,correctAnswers:0,totalPointsEarned:0,gamesCompleted:0,totalHurufLearned:0,totalWordsLearned:0,totalAyatsRead:0,perfectScores:0};
+  state.wheelSpinCount=0;
+  state.totalHurufLearned=0;
+  state.totalAyatsRead=0;
+  state.totalWordsLearned=0;
+  state.perfectScores=0;
+  state.dailyChallenge={completed:false,type:'huruf',target:5,progress:0};
+  state.lastPlayDate=null;
+  state.hurufIdsSeen=new Set();
+  state.sukuIdsSeen=new Set();
+  state.wordsSeen=new Set();
+  state.wordsSeenCount=0;
+  state.ayatSeen=new Set();
+  state.ayatSeenCount=0;
+  state.usedIndices=[];
+  state.rodaCurrentWord=null;
+  state.gameQ=0;
+  state.gameScore=0;
+  // Restore profile
+  Object.assign(state, keep);
+  // Go home + sync
+  state.screen='home';
+  render();
+  syncNow();
+  setTimeout(()=>alert('✅ Data telah ditetapkan semula. Mulakan pembelajaran baru!'),200);
+}
+
+function renderBadges(){
+  const unlockedBadges=state.badges;
+  const lockedBadges=BADGE_SYSTEM.filter(b=>!state.badges.find(ub=>ub.id===b.id));
+  const progressPct=Math.round((unlockedBadges.length/BADGE_SYSTEM.length)*100);
+  return `
+  <div class="slide-up w-full max-w-2xl">
+    ${navBar('🏅 Badge Pencapaian','#EC4899')}
+    <div class="mb-6 bg-gradient-to-r from-pink-100 via-purple-100 to-indigo-100 rounded-3xl p-5 card-shadow border-3 border-pink-300">
+      <div class="flex items-center justify-between mb-3">
+        <span class="font-black text-lg" style="color:#EC4899">Kemajuan Koleksi Badge</span>
+        <span class="font-black text-2xl" style="color:#EC4899">${unlockedBadges.length}/${BADGE_SYSTEM.length}</span>
+      </div>
+      <div class="h-4 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.6)"><div class="h-full rounded-full transition-all flex items-center justify-center" style="width:${progressPct}%;background:linear-gradient(90deg,#EC4899,#BE185D)"><span class="text-white font-bold text-xs" style="text-shadow:0 1px 2px rgba(0,0,0,0.2)">${progressPct}%</span></div></div>
+    </div>
+    
+    ${unlockedBadges.length>0?`
+    <div class="mb-8">
+      <div class="font-black mb-4 text-lg flex items-center gap-2" style="color:#EC4899">
+        <span>🌟</span>
+        <span>Badge Terbuka (${unlockedBadges.length})</span>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        ${unlockedBadges.map((b,idx)=>{
+          const badgeInfo=BADGE_SYSTEM.find(bs=>bs.id===b.id);
+          return `
+          <div class="group relative overflow-hidden rounded-3xl card-shadow flip-in hover:scale-105 transition-transform cursor-pointer" style="animation-delay:${idx*0.1}s">
+            <div class="absolute inset-0 bg-gradient-to-br from-yellow-300 via-orange-300 to-pink-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="relative bg-gradient-to-br from-yellow-100 to-yellow-50 p-6 text-center border-3 border-yellow-300 rounded-3xl group-hover:from-yellow-200 group-hover:to-yellow-100 transition-all duration-300">
+              <div class="text-5xl mb-3 group-hover:scale-125 transition-transform duration-300" style="text-shadow:0 4px 12px rgba(255,179,71,0.3)">${b.icon}</div>
+              <div class="font-black text-sm mb-1" style="color:#EC4899">${b.name}</div>
+              <div class="text-xs font-bold text-orange-600 mb-2">${badgeInfo?.desc}</div>
+              <div class="inline-block px-3 py-1 rounded-full font-bold text-xs" style="background:#4ECDC4;color:white">✅ Didapat!</div>
+            </div>
+          </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+    `:''}
+    
+    ${lockedBadges.length>0?`
+    <div>
+      <div class="font-black mb-4 text-lg flex items-center gap-2" style="color:#999">
+        <span>🔒</span>
+        <span>Badge Tersembunyi (${lockedBadges.length})</span>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        ${lockedBadges.map((b,idx)=>`
+        <div class="relative overflow-hidden rounded-3xl card-shadow opacity-75 hover:opacity-100 transition-opacity">
+          <div class="bg-gradient-to-br from-gray-200 to-gray-100 p-6 text-center border-3 border-dashed border-gray-300 rounded-3xl">
+            <div class="text-5xl mb-3 blur-sm filter">❓</div>
+            <div class="font-black text-sm mb-1 text-gray-600">${b.name}</div>
+            <div class="text-xs font-bold text-gray-500 mb-3 leading-snug">${b.desc}</div>
+            <div class="inline-block px-3 py-1 rounded-full font-bold text-xs" style="background:#ccc;color:#666">🔒 Terkunci</div>
+          </div>
+        </div>
+        `).join('')}
+      </div>
+      <div class="mt-4 p-3 bg-blue-50 rounded-2xl border-2 border-blue-300 text-center">
+        <div class="text-xs font-bold text-blue-700">💡 Terus belajar untuk membuka badge baru!</div>
+      </div>
+    </div>
+    `:''}
+  </div>`;
+}
+
+function renderStats(){
+  const acc=state.lifetimeStats.totalQuestionsAnswered>0?Math.round((state.lifetimeStats.correctAnswers/state.lifetimeStats.totalQuestionsAnswered)*100):0;
+  return `
+  <div class="slide-up w-full max-w-2xl">
+    ${navBar('📊 Statistik Pembelajaran','#00BCD4')}
+    <div class="space-y-4">
+      <div class="p-5 bg-white rounded-2xl card-shadow">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold" style="color:#00BCD4">Jumlah Soalan Dijawab</span>
+          <span class="font-black text-2xl" style="color:#00BCD4">${state.lifetimeStats.totalQuestionsAnswered}</span>
+        </div>
+      </div>
+      <div class="p-5 bg-white rounded-2xl card-shadow">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold" style="color:#4ECDC4">Jawapan Betul</span>
+          <span class="font-black text-2xl" style="color:#4ECDC4">${state.lifetimeStats.correctAnswers}</span>
+        </div>
+      </div>
+      <div class="p-5 bg-white rounded-2xl card-shadow">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold" style="color:#FF1744">Ketepatan</span>
+          <span class="font-black text-2xl" style="color:#FF1744">${acc}%</span>
+        </div>
+        <div class="h-3 rounded-full overflow-hidden" style="background:#eee"><div class="h-full rounded-full" style="width:${acc}%;background:linear-gradient(90deg,#FF1744,#FF69B4)"></div></div>
+      </div>
+      <div class="p-5 bg-white rounded-2xl card-shadow">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold" style="color:#FFB347">Permainan Dimainkan</span>
+          <span class="font-black text-2xl" style="color:#FFB347">${state.lifetimeStats.gamesCompleted}</span>
+        </div>
+      </div>
+      <div class="p-5 bg-white rounded-2xl card-shadow">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold" style="color:#A78BFA">Jumlah Mata Permainan</span>
+          <span class="font-black text-2xl" style="color:#A78BFA">${state.lifetimeStats.totalPointsEarned}</span>
+        </div>
+      </div>
+      <div class="p-5 bg-white rounded-2xl card-shadow">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold" style="color:#4ECDC4">Huruf Dipelajari</span>
+          <span class="font-black text-2xl" style="color:#4ECDC4">${state.lifetimeStats.totalHurufLearned}/26</span>
+        </div>
+        <div class="h-3 rounded-full overflow-hidden" style="background:#eee"><div class="h-full rounded-full" style="width:${(state.lifetimeStats.totalHurufLearned/26)*100}%;background:#4ECDC4"></div></div>
+      </div>
+      <div class="p-5 bg-white rounded-2xl card-shadow">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold" style="color:#FFB347">Perkataan Dipelajari</span>
+          <span class="font-black text-2xl" style="color:#FFB347">${state.lifetimeStats.totalWordsLearned}/${PERKATAAN.length}</span>
+        </div>
+        <div class="h-3 rounded-full overflow-hidden" style="background:#eee"><div class="h-full rounded-full" style="width:${(state.lifetimeStats.totalWordsLearned/PERKATAAN.length)*100}%;background:#FFB347"></div></div>
+      </div>
+      <div class="p-5 bg-white rounded-2xl card-shadow">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold" style="color:#A78BFA">Ayat Dibaca</span>
+          <span class="font-black text-2xl" style="color:#A78BFA">${state.lifetimeStats.totalAyatsRead}/${AYAT.length}</span>
+        </div>
+        <div class="h-3 rounded-full overflow-hidden" style="background:#eee"><div class="h-full rounded-full" style="width:${(state.lifetimeStats.totalAyatsRead/AYAT.length)*100}%;background:#A78BFA"></div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderDailyChallenge(){
+  const isComplete=state.dailyChallenge.completed;
+  const typeLabel={
+    'huruf':'📖 Kenal Huruf',
+    'sukukata':'🔤 Suku Kata',
+    'perkataan':'📝 Perkataan',
+    'ayat':'💬 Ayat Mudah'
+  };
+  const typeColor={
+    'huruf':'#FF6B6B',
+    'sukukata':'#4ECDC4',
+    'perkataan':'#FFB347',
+    'ayat':'#A78BFA'
+  };
+  const col=typeColor[state.dailyChallenge.type]||'#FFB347';
+  const label=typeLabel[state.dailyChallenge.type]||'📚 Cabaran';
+  
+  return `
+  <div class="slide-up w-full max-w-2xl">
+    ${navBar('📅 Cabaran Harian','#FFB347')}
+    <div class="bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-3xl p-6 card-shadow border-3 border-yellow-300 mb-4">
+      <div class="text-center">
+        <div class="text-5xl mb-3 float-anim">🎯</div>
+        <div class="font-black text-2xl mb-2" style="color:#FF6F00">Cabaran Hari Ini!</div>
+        <div class="font-bold text-lg mb-4 px-3 py-2 rounded-xl inline-block" style="background:${col}20;color:${col}">${label}</div>
+        <div class="mb-4">
+          <div class="flex-1 h-4 rounded-full overflow-hidden" style="background:#fff"><div class="h-full rounded-full transition-all" style="width:${(state.dailyChallenge.progress/state.dailyChallenge.target)*100}%;background:linear-gradient(90deg,#FFD700,#FF6F00)"></div></div>
+          <div class="font-black text-3xl mt-3" style="color:#FF6F00">${state.dailyChallenge.progress}/${state.dailyChallenge.target}</div>
+        </div>
+        ${isComplete?`
+          <div class="mb-4 p-4 bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl border-3 border-green-500 bounce-in">
+            <div class="font-black text-2xl text-green-700 mb-1">🎉 Cabaran Selesai!</div>
+            <div class="font-bold text-green-600">Terbaik! Teruskan esok untuk jalur pembelajaran🔥</div>
+          </div>
+        `:`
+          <button onclick="playClick();go('${state.dailyChallenge.type}')" class="btn-bounce w-full py-4 rounded-xl font-bold text-white text-lg mb-2 transform transition-all hover:scale-105" style="background:linear-gradient(135deg,#FF6F00,#FF9800);box-shadow:0 6px 20px rgba(255,111,0,0.4)">🚀 Mulai Cabaran</button>
+        `}
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 card-shadow mb-4">
+      <div class="font-bold mb-3 text-lg" style="color:#FFB347">🔥 Jalur Pembelajaran</div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="text-center p-3 rounded-xl" style="background:#FFE0B2">
+          <div class="text-sm font-bold text-gray-600 mb-1">Jalur Semasa</div>
+          <div class="text-3xl font-black" style="color:#FF6F00">${state.streak}</div>
+          <div class="text-xs font-semibold text-gray-600">hari berturut-turut</div>
+        </div>
+        <div class="text-center p-3 rounded-xl" style="background:#FFB74D">
+          <div class="text-sm font-bold text-gray-700 mb-1">Jalur Terbaik</div>
+          <div class="text-3xl font-black text-white">${state.bestStreak}</div>
+          <div class="text-xs font-semibold text-white">rekod tertinggi</div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl p-4 card-shadow border-2 border-orange-300">
+      <div class="font-bold mb-2" style="color:#FF6F00">📌 Maklumat Cabaran</div>
+      <div class="text-sm space-y-2 font-semibold" style="color:#333">
+        <div class="flex items-center gap-2">
+          <span>✓</span>
+          <span>Selesaikan ${state.dailyChallenge.target} tugasan untuk cabaran hari ini</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span>✓</span>
+          <span>Teruskan pembelajaran setiap hari untuk mempertahankan jalur</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span>✓</span>
+          <span>Kumpul jalur panjang untuk mendapat lencana istimewa!</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderHuruf(){
+  const h=HURUF[state.hurufIdx];
+  if(!state.lifetimeStats.totalHurufLearned||!state.hurufIdsSeen) state.hurufIdsSeen=new Set();
+  if(!state.hurufIdsSeen.has(state.hurufIdx)){
+    state.hurufIdsSeen.add(state.hurufIdx);
+    state.lifetimeStats.totalHurufLearned=Math.max(state.lifetimeStats.totalHurufLearned,state.hurufIdsSeen.size);
+    state.totalHurufLearned=state.lifetimeStats.totalHurufLearned;
+    if(state.dailyChallenge.type==='huruf'&&state.dailyChallenge.progress<state.dailyChallenge.target){
+      state.dailyChallenge.progress++;
+      if(state.dailyChallenge.progress>=state.dailyChallenge.target){
+        state.dailyChallenge.completed=true;
+      }
+    }
+  }
+  return `${navBar('📖 Kenal Huruf','#FF6B6B')}
+  <div class="bg-white rounded-3xl p-8 card-shadow text-center pop-in relative overflow-hidden" id="huruf-card">
+    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 30% 30%,rgba(255,107,107,0.1),transparent 50%);pointer-events:none"></div>
+    <div class="letter-card font-black relative z-10" style="color:#FF6B6B">${h.h} ${h.k}</div>
+    <div class="emoji-img my-4 float-anim relative z-10">${h.e}</div>
+    <div class="word-display font-extrabold relative z-10" style="color:#2D3436">${h.p}</div>
+    <div class="flex justify-center gap-3 mt-5 relative z-10">
+      <button onclick="speak('${h.h}')" class="btn-bounce px-5 py-3 rounded-xl font-bold text-white transform transition-all" style="background:#FF6B6B;box-shadow:0 4px 15px rgba(255,107,107,0.3)">🔊 Huruf</button>
+      <button onclick="speak('${h.p}')" class="btn-bounce px-5 py-3 rounded-xl font-bold text-white transform transition-all" style="background:#4ECDC4;box-shadow:0 4px 15px rgba(78,205,196,0.3)">🔊 Perkataan</button>
+    </div>
+  </div>
+  ${arrowBtns("prevHuruf()","nextHuruf()",HURUF.length,state.hurufIdx,'#FF6B6B')}
+  <div class="mt-6 p-5 bg-white rounded-2xl card-shadow">
+    <p class="font-bold text-sm mb-4" style="color:#FF6B6B">Pilih huruf:</p>
+    <div class="grid grid-cols-7 gap-2">
+      ${HURUF.map((letter,idx)=>`<button onclick="playClick();state.hurufIdx=${idx};render()" class="btn-bounce p-3 rounded-lg font-bold text-sm transition-all" style="background:${state.hurufIdx===idx?'linear-gradient(135deg,#FF6B6B,#FF8787)':'#FFE5E5'};color:${state.hurufIdx===idx?'white':'#FF6B6B'};border:${state.hurufIdx===idx?'3px solid #FF1744':'none'};box-shadow:${state.hurufIdx===idx?'0 4px 12px rgba(255,107,107,0.4)':'none'}">${letter.h}</button>`).join('')}
+    </div>
+  </div>
+  <div class="mt-6 text-center"><button onclick="playClick();if(!state.stars[0]){state.stars[0]=true;playCorrect();setTimeout(()=>{showSmallFireworks();},600);}go('home')" class="btn-bounce px-8 py-3 rounded-xl font-bold text-white transform transition-all pulse-ring" style="background:linear-gradient(135deg,#4ECDC4,#00BCD4);box-shadow:0 6px 20px rgba(78,205,196,0.4)">✅ Siap Belajar!</button></div>`;
+}
+
+function renderSukukata(){
+  const s=SUKUKATA[state.sukuIdx];
+  if(!state.sukuIdsSeen) state.sukuIdsSeen=new Set();
+  if(!state.sukuIdsSeen.has(state.sukuIdx)){
+    state.sukuIdsSeen.add(state.sukuIdx);
+    if(state.dailyChallenge.type==='sukukata'&&state.dailyChallenge.progress<state.dailyChallenge.target){
+      state.dailyChallenge.progress++;
+      if(state.dailyChallenge.progress>=state.dailyChallenge.target){
+        state.dailyChallenge.completed=true;
+      }
+    }
+  }
+  return `${navBar('🔤 Suku Kata','#4ECDC4')}
+  <div class="bg-white rounded-3xl p-8 card-shadow text-center pop-in relative overflow-hidden">
+    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 70% 30%,rgba(78,205,196,0.1),transparent 50%);pointer-events:none"></div>
+    <div class="emoji-img mb-5 float-anim relative z-10">${s.e}</div>
+    <div class="flex justify-center items-center flex-wrap gap-3 mb-5 relative z-10">
+      <span class="suku-kata-part" style="background:linear-gradient(135deg,#BAFFC9,#76E4B5);color:#2D3436;box-shadow:0 4px 12px rgba(118,228,181,0.3)">${s.s1}</span>
+      <span class="font-black text-3xl" style="color:#FF6B6B">+</span>
+      <span class="suku-kata-part" style="background:linear-gradient(135deg,#BAE1FF,#4FA3FF);color:#2D3436;box-shadow:0 4px 12px rgba(79,163,255,0.3)">${s.s2}</span>
+      <span class="font-black text-3xl" style="color:#FF6B6B">=</span>
+      <span class="suku-kata-part" style="background:linear-gradient(135deg,#FFB3BA,#FF69B4);color:#2D3436;box-shadow:0 4px 12px rgba(255,105,180,0.3)">${s.p}</span>
+    </div>
+    <div class="flex justify-center gap-3 mt-5 relative z-10 flex-wrap">
+      <button onclick="speak('${s.s1}')" class="btn-bounce px-4 py-2 rounded-xl font-bold text-white text-sm transform transition-all" style="background:#4ECDC4;box-shadow:0 4px 12px rgba(78,205,196,0.3)">🔊 ${s.s1}</button>
+      <button onclick="speak('${s.s2}')" class="btn-bounce px-4 py-2 rounded-xl font-bold text-white text-sm transform transition-all" style="background:#4ECDC4;box-shadow:0 4px 12px rgba(78,205,196,0.3)">🔊 ${s.s2}</button>
+      <button onclick="speak('${s.p}')" class="btn-bounce px-4 py-2 rounded-xl font-bold text-white text-sm transform transition-all" style="background:#FF6B6B;box-shadow:0 4px 12px rgba(255,107,107,0.3)">🔊 ${s.p}</button>
+    </div>
+  </div>
+  ${arrowBtns("prevSuku()","nextSuku()",SUKUKATA.length,state.sukuIdx,'#4ECDC4')}
+  <div class="mt-6 text-center"><button onclick="playClick();state.stars[1]=true;playCorrect();setTimeout(()=>{showSmallFireworks();},600);go('home')" class="btn-bounce px-8 py-3 rounded-xl font-bold text-white transform transition-all pulse-ring" style="background:linear-gradient(135deg,#FF6B6B,#FF8787);box-shadow:0 6px 20px rgba(255,107,107,0.4)">✅ Siap Belajar!</button></div>`;
+}
+
+function renderPerkataan(){
+  if(!state.shuffledPerkataan){
+    state.shuffledPerkataan=shuffle(PERKATAAN);
+    state.perkataanIdx=0;
+  }
+  const p=state.shuffledPerkataan[state.perkataanIdx];
+  if(!state.wordsSeenCount) state.wordsSeenCount=0;
+  if(!state.wordsSeen) state.wordsSeen=new Set();
+  const wordKey=PERKATAAN.findIndex(w=>w.p===p.p);
+  if(!state.wordsSeen.has(wordKey)){
+    state.wordsSeen.add(wordKey);
+    state.wordsSeenCount++;
+    state.lifetimeStats.totalWordsLearned=state.wordsSeenCount;
+    state.totalWordsLearned=state.wordsSeenCount;
+    if(state.dailyChallenge.type==='perkataan'&&state.dailyChallenge.progress<state.dailyChallenge.target){
+      state.dailyChallenge.progress++;
+      if(state.dailyChallenge.progress>=state.dailyChallenge.target){
+        state.dailyChallenge.completed=true;
+      }
+    }
+  }
+  return `${navBar('📝 Perkataan','#FFB347')}
+  <div class="bg-white rounded-3xl p-10 card-shadow text-center pop-in relative overflow-hidden">
+    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 50% 50%,rgba(255,179,71,0.1),transparent 60%);pointer-events:none"></div>
+    <div class="emoji-img mb-6 float-anim relative z-10">${p.e}</div>
+    <div class="font-black text-6xl md:text-7xl mb-6 relative z-10" style="color:#FFB347;text-shadow:0 4px 20px rgba(255,179,71,0.3)">${p.p}</div>
+    <button onclick="speak('${p.p}')" class="btn-bounce px-8 py-4 rounded-xl font-bold text-white text-lg transform transition-all pulse-ring relative z-10" style="background:linear-gradient(135deg,#FFB347,#FF9800);box-shadow:0 6px 20px rgba(255,179,71,0.4)">🔊 Dengar Sebutan</button>
+  </div>
+  ${arrowBtns("prevPerk()","nextPerk()",state.shuffledPerkataan.length,state.perkataanIdx,'#FFB347')}`;
+}
+
+function renderAyat(){
+  const a=AYAT[state.ayatIdx];
+  if(!state.ayatSeenCount) state.ayatSeenCount=0;
+  if(!state.ayatSeen) state.ayatSeen=new Set();
+  if(!state.ayatSeen.has(state.ayatIdx)){
+    state.ayatSeen.add(state.ayatIdx);
+    state.ayatSeenCount++;
+    state.lifetimeStats.totalAyatsRead=state.ayatSeenCount;
+    state.totalAyatsRead=state.ayatSeenCount;
+    if(state.dailyChallenge.type==='ayat'&&state.dailyChallenge.progress<state.dailyChallenge.target){
+      state.dailyChallenge.progress++;
+      if(state.dailyChallenge.progress>=state.dailyChallenge.target){
+        state.dailyChallenge.completed=true;
+      }
+    }
+  }
+  return `${navBar('💬 Ayat Mudah','#A78BFA')}
+  <div class="bg-white rounded-3xl p-10 card-shadow text-center pop-in relative overflow-hidden">
+    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(167,139,250,0.1),rgba(167,139,250,0.05));pointer-events:none"></div>
+    <div class="text-6xl mb-6 float-anim wiggle relative z-10">💬</div>
+    <div class="font-black text-4xl md:text-5xl mb-6 leading-snug relative z-10" style="color:#A78BFA;text-shadow:0 2px 10px rgba(167,139,250,0.2)">${a}</div>
+    <button onclick="speak('${a}')" class="btn-bounce px-8 py-4 rounded-xl font-bold text-white text-lg transform transition-all pulse-ring relative z-10" style="background:linear-gradient(135deg,#A78BFA,#9370DB);box-shadow:0 6px 20px rgba(167,139,250,0.4)">🔊 Dengar Ayat</button>
+  </div>
+  ${arrowBtns("prevAyat()","nextAyat()",AYAT.length,state.ayatIdx,'#A78BFA')}
+  <div class="mt-6 text-center"><button onclick="playClick();state.stars[2]=true;playCorrect();setTimeout(()=>{showSmallFireworks();},600);go('home')" class="btn-bounce px-8 py-3 rounded-xl font-bold text-white transform transition-all pulse-ring" style="background:linear-gradient(135deg,#A78BFA,#9370DB);box-shadow:0 6px 20px rgba(167,139,250,0.4)">✅ Siap Belajar!</button></div>`;
+}
+
+function renderGameMenu(){
+  return `${navBar('🎮 Permainan','#F472B6')}
+  <div class="flex flex-col gap-3 slide-up">
+    ${gameMenuBtn('🖼️','Teka Gambar','Pilih perkataan yang betul','tekaGambar','#F472B6','#FCE4EC')}
+    ${gameMenuBtn('✅','Pilih Jawapan','Pilih jawapan yang betul','pilihJawapan','#4ECDC4','#D4F5F0')}
+    ${gameMenuBtn('🔗','Padankan Huruf','Padankan huruf dengan gambar','padanHuruf','#FFB347','#FFF0D4')}
+    ${gameMenuBtn('🧩','Susun Suku Kata','Susun suku kata jadi perkataan','susunSuku','#A78BFA','#EDE5FF')}
+    ${gameMenuBtn('🎡','Roda Impian Perkataan','Putar roda dan baca perkataan','rodaImpian','#EC4899','#FCE7F3')}
+  </div>`;
+}
+
+function gameMenuBtn(icon,title,desc,type,color,bg){
+  return `<button onclick="playClick();startGame('${type}')" class="btn-bounce nav-btn w-full flex items-center gap-4 p-5 rounded-2xl card-shadow transform transition-all duration-200 hover:shadow-lg" style="background:${bg};border:3px solid ${color};position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,0.2) 50%,transparent 70%);pointer-events:none"></div>
+    <span class="text-4xl relative z-10">${icon}</span>
+    <div class="text-left relative z-10"><div class="font-extrabold text-lg" style="color:${color}">${title}</div><div class="text-sm font-semibold" style="color:#666">${desc}</div></div>
+  </button>`;
+}
+
+function miniMenuBtn(icon,label,screen,color,bgColor,delay,glow){
+  return `<button onclick="playClick();go('${screen}')" class="btn-bounce flex flex-col items-center justify-center p-6 rounded-3xl card-shadow font-bold transition-transform hover:scale-105 bounce-in ${glow?'glow-pulse wiggle':''}" style="background:${bgColor};border:4px solid ${color};aspect-ratio:1;animation-delay:${delay}s;box-shadow:0 8px 20px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.3);position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,0.2) 50%,transparent 70%);pointer-events:none"></div>
+    <span class="text-5xl mb-2 float-anim">${icon}</span>
+    <span class="text-sm font-bold text-center leading-tight" style="color:${color}">${label}</span>
+  </button>`;
+}
+
+function navBar(title,color){
+  return `<div class="flex items-center gap-3 mb-4">
+    <button onclick="playClick();go('home')" class="btn-bounce nav-btn p-2 rounded-xl" style="background:${color}20"><i data-lucide="arrow-left" style="color:${color}" width="24" height="24"></i></button>
+    <h2 class="font-black text-xl" style="color:${color}">${title}</h2>
+  </div>`;
+}
+
+function arrowBtns(prev,next,max,idx,color){
+  return `<div class="flex justify-between mt-6">
+    <button onclick="playClick();${prev}" class="btn-bounce nav-btn px-5 py-3 rounded-xl font-bold text-white ${idx<=0?'opacity-30 pointer-events-none':''}" style="background:${color}"><i data-lucide="chevron-left" width="20" height="20"></i></button>
+    <span class="font-bold self-center" style="color:${color}">${idx+1} / ${max}</span>
+    <button onclick="playClick();${next}" class="btn-bounce nav-btn px-5 py-3 rounded-xl font-bold text-white ${idx>=max-1?'opacity-30 pointer-events-none':''}" style="background:${color}"><i data-lucide="chevron-right" width="20" height="20"></i></button>
+  </div>`;
+}
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+function startGame(type){
+  state.gameType=type;state.gameQ=0;state.gameScore=0;state.gameFeedback=null;state.usedIndices=[];
+  state.gameTotal=state.difficulty==='mudah'?3:state.difficulty==='sukar'?10:5;
+  if(type==='rodaImpian'){
+    state.screen='rodaImpian';
+    state.rodaCurrentWord=null;
+    state.rodaIsSpinning=false;
+    state.wheelSpinCount++;
+  } else {
+    generateQuestion();
+    state.screen='playing';
+  }
+  render();
+}
+
+function generateQuestion(){
+  state.gameFeedback=null;
+  if(state.gameType==='tekaGambar'){
+    const availableIndices=Array.from({length:PERKATAAN.length},((_,i)=>i)).filter(i=>!state.usedIndices.includes(i));
+    if(availableIndices.length===0)return;
+    const idx=availableIndices[Math.floor(Math.random()*availableIndices.length)];
+    state.usedIndices.push(idx);
+    const correct=PERKATAAN[idx];
+    let opts=[correct];
+    const availableOpts=PERKATAAN.filter((_,i)=>i!==idx);
+    while(opts.length<3&&availableOpts.length>0){const r=availableOpts[Math.floor(Math.random()*availableOpts.length)];if(!opts.find(o=>o.p===r.p)){opts.push(r);availableOpts.splice(availableOpts.indexOf(r),1);}}
+    state.gameData={correct,opts:shuffle(opts)};
+    state.gameAnswer=correct.p;
+  } else if(state.gameType==='pilihJawapan'){
+    const availableIndices=Array.from({length:SUKUKATA.length},((_,i)=>i)).filter(i=>!state.usedIndices.includes(i));
+    if(availableIndices.length===0)return;
+    const idx=availableIndices[Math.floor(Math.random()*availableIndices.length)];
+    state.usedIndices.push(idx);
+    const correct=SUKUKATA[idx];
+    let opts=[correct.p];
+    const availableOpts=SUKUKATA.filter((_,i)=>i!==idx);
+    while(opts.length<3&&availableOpts.length>0){const r=availableOpts[Math.floor(Math.random()*availableOpts.length)].p;if(!opts.includes(r)){opts.push(r);availableOpts.splice(availableOpts.findIndex(x=>x.p===r),1);}}
+    state.gameData={correct,opts:shuffle(opts)};
+    state.gameAnswer=correct.p;
+  } else if(state.gameType==='padanHuruf'){
+    const availableIndices=Array.from({length:HURUF.length},((_,i)=>i)).filter(i=>!state.usedIndices.includes(i));
+    if(availableIndices.length===0)return;
+    const idx=availableIndices[Math.floor(Math.random()*availableIndices.length)];
+    state.usedIndices.push(idx);
+    const correct=HURUF[idx];
+    let opts=[correct];
+    const availableOpts=HURUF.filter((_,i)=>i!==idx);
+    while(opts.length<3&&availableOpts.length>0){const r=availableOpts[Math.floor(Math.random()*availableOpts.length)];if(!opts.find(o=>o.h===r.h)){opts.push(r);availableOpts.splice(availableOpts.indexOf(r),1);}}
+    state.gameData={correct,opts:shuffle(opts)};
+    state.gameAnswer=correct.h;
+  } else if(state.gameType==='susunSuku'){
+    const availableIndices=Array.from({length:SUKUKATA.length},((_,i)=>i)).filter(i=>!state.usedIndices.includes(i));
+    if(availableIndices.length===0)return;
+    const idx=availableIndices[Math.floor(Math.random()*availableIndices.length)];
+    state.usedIndices.push(idx);
+    const correct=SUKUKATA[idx];
+    const parts=shuffle([correct.s1,correct.s2]);
+    state.gameData={correct,parts,selected:[]};
+    state.gameAnswer=correct.p;
+  }
+}
+
+function answerGame(ans){
+  if(state.gameFeedback)return;
+  state.lifetimeStats.totalQuestionsAnswered++;
+  if(ans===state.gameAnswer){
+    state.gameScore++;
+    state.lifetimeStats.correctAnswers++;
+    state.gameFeedback='correct';playCorrect();
+    const card=document.getElementById('game-card');if(card)showConfetti(card);
+    if(state.gameScore===state.gameTotal){
+      state.perfectScores++;
+      state.lifetimeStats.perfectScores++;
+    }
+  } else {
+    state.gameFeedback='wrong';playWrong();
+  }
+  render();
+  setTimeout(()=>{
+    state.gameQ++;
+    if(state.gameQ>=state.gameTotal){
+      state.gamePoints+=state.gameScore*2;
+      state.lifetimeStats.totalPointsEarned+=state.gameScore*2;
+      state.lifetimeStats.gamesCompleted++;
+      state.totalGamesPlayed++;
+      state.screen='gameResult';
+      checkAndUnlockBadges();
+      render();
+    }
+    else{generateQuestion();render();}
+  },1200);
+}
+
+function selectSuku(part,idx){
+  if(state.gameFeedback)return;
+  state.gameData.selected.push({part,idx});
+  if(state.gameData.selected.length===2){
+    const word=state.gameData.selected.map(s=>s.part).join('');
+    answerGame(word);
+  } else {render();}
+}
+
+function renderPlaying(){
+  const d=state.gameData;const fb=state.gameFeedback;
+  const titles={'tekaGambar':'🖼️ Teka Gambar','pilihJawapan':'✅ Pilih Jawapan','padanHuruf':'🔗 Padankan Huruf','susunSuku':'🧩 Susun Suku Kata'};
+  const colors={'tekaGambar':'#F472B6','pilihJawapan':'#4ECDC4','padanHuruf':'#FFB347','susunSuku':'#A78BFA'};
+  const col=colors[state.gameType];
+
+  const navBarHtml=`<div class="flex items-center gap-3 mb-4">
+    <button onclick="playClick();go('game')" class="btn-bounce nav-btn p-2 rounded-xl" style="background:${col}20"><i data-lucide="arrow-left" style="color:${col}" width="24" height="24"></i></button>
+    <h2 class="font-black text-xl" style="color:${col}">${titles[state.gameType]}</h2>
+  </div>`;
+
+  let inner='';
+  if(state.gameType==='tekaGambar'){
+    inner=`<div class="emoji-img mb-4 float-anim">${d.correct.e}</div>
+    <p class="font-bold text-lg mb-4" style="color:#666">Apakah gambar ini?</p>
+    <div class="flex flex-col gap-3">${d.opts.map(o=>`<button onclick="answerGame('${o.p}')" class="game-option btn-bounce p-4 rounded-2xl font-extrabold text-xl ${fb&&o.p===state.gameAnswer?'ring-4 ring-green-400':fb&&o.p!==state.gameAnswer?'opacity-50':''}" style="background:${PASTELS[Math.floor(Math.random()*6)]}30;border:3px solid ${col}40;color:#2D3436">${o.p}</button>`).join('')}</div>`;
+  } else if(state.gameType==='pilihJawapan'){
+    inner=`<div class="flex justify-center items-center gap-2 mb-4">
+      <span class="suku-kata-part" style="background:#BAFFC9">${d.correct.s1}</span>
+      <span class="font-black text-2xl" style="color:#FF6B6B">+</span>
+      <span class="suku-kata-part" style="background:#BAE1FF">${d.correct.s2}</span>
+      <span class="font-black text-2xl" style="color:#FF6B6B">= ?</span>
+    </div>
+    <div class="flex flex-col gap-3">${d.opts.map(o=>`<button onclick="answerGame('${o}')" class="game-option btn-bounce p-4 rounded-2xl font-extrabold text-xl" style="background:${PASTELS[Math.floor(Math.random()*6)]}30;border:3px solid ${col}40;color:#2D3436">${o}</button>`).join('')}</div>`;
+  } else if(state.gameType==='padanHuruf'){
+    inner=`<div class="emoji-img mb-4 float-anim">${d.correct.e}</div>
+    <p class="font-bold text-lg mb-2" style="color:#666">${d.correct.p}</p>
+    <p class="font-bold mb-4" style="color:${col}">Huruf pertama ialah?</p>
+    <div class="flex justify-center gap-4">${d.opts.map((o,idx)=>`<button onclick="answerGame('${o.h}')" class="game-option btn-bounce w-20 h-20 rounded-2xl font-black text-3xl" style="background:${PASTELS[idx%PASTELS.length]};border:3px solid ${col}40;color:#2D3436">${o.h}</button>`).join('')}</div>`;
+  } else if(state.gameType==='susunSuku'){
+    const sel=d.selected||[];
+    inner=`<div class="emoji-img mb-4" style="animation:none">${d.correct.e}</div>
+    <p class="font-bold text-lg mb-4" style="color:#666">Susun suku kata untuk: <b style="color:${col}">${d.correct.p}</b></p>
+    <div class="flex justify-center gap-4">${d.parts.map((p,i)=>{
+      const used=sel.find(s=>s.idx===i);
+      return `<button onclick="selectSuku('${p}',${i})" class="btn-bounce px-6 py-4 rounded-2xl font-extrabold text-2xl transition-opacity ${used?'opacity-30 pointer-events-none':''}" style="background:${i===0?'#BAFFC9':'#BAE1FF'};border:3px solid ${col}40;color:#2D3436">${p}</button>`;
+    }).join('')}</div>
+    ${sel.length>0?`<div class="mt-4 text-center font-bold text-2xl transition-all" style="color:${col}">${sel.map(s=>s.part).join(' + ')}${sel.length<2?' + ?':' = '+sel.map(s=>s.part).join('')}</div>`:''}`;
+  }
+
+  const fbHtml=fb==='correct'?`<div class="bounce-in text-center mt-4 p-3 rounded-2xl font-extrabold text-xl" style="background:#D4EDDA;color:#155724">✅ Betul! Syabas! 🎉</div>`:
+    fb==='wrong'?`<div class="shake-anim text-center mt-4 p-3 rounded-2xl font-extrabold text-xl" style="background:#F8D7DA;color:#721C24">❌ Cuba lagi!</div>`:'';
+
+  return `${navBarHtml}
+  <div class="mb-3 flex items-center gap-2">
+    <div class="flex-1 h-3 rounded-full overflow-hidden" style="background:#eee"><div class="h-full rounded-full transition-all" style="width:${(state.gameQ/state.gameTotal)*100}%;background:${col}"></div></div>
+    <span class="font-bold text-sm" style="color:${col}">${state.gameQ+1}/${state.gameTotal}</span>
+  </div>
+  <div class="bg-white rounded-3xl p-6 card-shadow text-center pop-in relative overflow-hidden" id="game-card">
+    ${inner}${fbHtml}
+  </div>`;
+}
+
+function renderGameResult(){
+  const pct=Math.round((state.gameScore/state.gameTotal)*100);
+  const msg=pct>=80?'🌟 Hebat! Cemerlang!':pct>=60?'👍 Bagus! Teruskan!':'💪 Cuba lagi!';
+  const pointsEarned=state.gameScore*2;
+  const totalPointsNow=state.gamePoints;
+  const nextStarAt=50-Math.max(0,totalPointsNow);
+  
+  if(totalPointsNow>=50 && !state.stars[3]){
+    state.stars[3]=true;
+    setTimeout(()=>{showSmallFireworks();},600);
+  }
+  return `${navBar('🎮 Keputusan','#F472B6')}
+  <div class="bg-white rounded-3xl p-8 card-shadow text-center pop-in relative overflow-hidden" id="result-card">
+    <div class="text-6xl mb-3">${pct>=80?'🏆':'🎯'}</div>
+    <div class="font-black text-2xl mb-2" style="color:#F472B6">${msg}</div>
+    <div class="font-extrabold text-5xl mb-2" style="color:#FFB347">${state.gameScore}/${state.gameTotal}</div>
+    <div class="text-lg font-bold mb-4" style="color:#666">${pct}% betul</div>
+    <div class="bg-gradient-to-r from-pink-100 to-red-100 p-4 rounded-2xl mb-4">
+      <div class="font-bold text-lg" style="color:#FF1744">+${pointsEarned} Mata Permainan 🎮</div>
+      <div class="font-bold text-sm" style="color:#666">Jumlah: ${totalPointsNow}/50</div>
+      ${totalPointsNow<50?`<div class="font-semibold text-sm" style="color:#FF1744">Perlu ${nextStarAt} mata lagi untuk bintang!</div>`:`<div class="font-bold text-sm" style="color:#4ECDC4">⭐ Bintang Permainan Didapat!</div>`}
+    </div>
+    <div class="flex justify-center gap-3">
+      <button onclick="playClick();startGame(state.gameType)" class="btn-bounce px-5 py-3 rounded-xl font-bold text-white" style="background:#4ECDC4">🔄 Main Lagi</button>
+      <button onclick="playClick();go('game')" class="btn-bounce px-5 py-3 rounded-xl font-bold text-white" style="background:#F472B6">📋 Menu</button>
+    </div>
+  </div>`;
+}
+
+function renderRodaImpian(){
+  if(!state.rodaCurrentWord){
+    const availableIndices=Array.from({length:PERKATAAN.length},((_,i)=>i)).filter(i=>!state.usedIndices.includes(i));
+    if(availableIndices.length===0){
+      state.gamePoints+=state.gameScore*2;
+      state.lifetimeStats.totalPointsEarned+=state.gameScore*2;
+      state.lifetimeStats.gamesCompleted++;
+      state.totalGamesPlayed++;
+      state.screen='gameResult';
+      checkAndUnlockBadges();
+      render();
+      return;
+    }
+  }
+
+  const currentWord=state.rodaCurrentWord;
+  const allWords=PERKATAAN;
+  const col='#EC4899';
+  
+  const customNavBar=`<div class="flex items-center gap-3 mb-4">
+    <button onclick="playClick();state.rodaCurrentWord=null;state.usedIndices=[];state.gameScore=0;state.gameQ=0;go('game')" class="btn-bounce nav-btn p-2 rounded-xl" style="background:${col}20"><i data-lucide="arrow-left" style="color:${col}" width="24" height="24"></i></button>
+    <h2 class="font-black text-xl" style="color:${col}">🎡 Roda Impian Perkataan</h2>
+  </div>`;
+  
+  return `${customNavBar}
+  <div class="bg-white rounded-3xl p-8 card-shadow text-center pop-in relative overflow-hidden">
+    <div class="mb-3 flex items-center gap-2">
+      <div class="flex-1 h-3 rounded-full overflow-hidden" style="background:#eee"><div class="h-full rounded-full transition-all" style="width:${(state.gameQ/state.gameTotal)*100}%;background:${col}"></div></div>
+      <span class="font-bold text-sm" style="color:${col}">${state.gameQ+1}/${state.gameTotal}</span>
+    </div>
+    
+    <div class="roda-container ${state.rodaIsSpinning?'roda-spinning':''}">
+      <div class="roda-pointer"></div>
+      <div class="roda-wheel" id="roda-wheel" style="background:conic-gradient(${allWords.map((_,i)=>PASTELS[i%PASTELS.length]).join(',')})"></div>
+    </div>
+    
+    <div class="mt-8 mb-6">
+      <button onclick="spinRoda()" class="btn-bounce roda-button text-white" style="background:linear-gradient(135deg,#EC4899,#BE185D);box-shadow:0 6px 20px rgba(236,72,153,0.4);${state.rodaIsSpinning?'pointer-events:none;opacity:0.6':''}" ${state.rodaIsSpinning?'disabled':''}>
+        <span class="float-anim">🎡 Putar Roda</span>
+      </button>
+    </div>
+    
+    ${currentWord?`
+    <div class="bg-gradient-to-r from-pink-100 to-red-100 rounded-3xl p-6">
+      <div class="emoji-img mb-3">${currentWord.e}</div>
+      <div class="roda-word-display">${currentWord.p}</div>
+      <div class="flex justify-center gap-3 flex-wrap mt-4">
+        <button onclick="speak('${currentWord.p}')" class="btn-bounce px-6 py-3 rounded-xl font-bold text-white text-lg" style="background:linear-gradient(135deg,#EC4899,#BE185D);box-shadow:0 4px 12px rgba(236,72,153,0.3)">🔊 Dengar</button>
+        <button onclick="confirmReadRoda()" class="btn-bounce px-6 py-3 rounded-xl font-bold text-white text-lg" style="background:linear-gradient(135deg,#4ECDC4,#00897B);box-shadow:0 4px 12px rgba(78,205,196,0.3)">✅ Sudah Baca</button>
+      </div>
+    </div>
+    `:'<div class="text-lg font-bold text-gray-500 py-8">Tekan butang untuk memulai! 👇</div>'}
+  </div>`;
+}
+
+function spinRoda(){
+  if(state.rodaIsSpinning)return;
+  
+  state.rodaIsSpinning=true;
+  playClick();
+  
+  const spinDuration=1500;
+  const spins=Math.floor(Math.random()*8)+8;
+  const randomDegree=Math.random()*360;
+  const totalDegree=spins*360+randomDegree;
+  
+  const wheel=document.getElementById('roda-wheel');
+  if(wheel){
+    wheel.style.transition=`transform ${spinDuration}ms cubic-bezier(0.25,0.46,0.45,0.94)`;
+    wheel.style.transform=`rotate(${totalDegree}deg)`;
+  }
+  
+  setTimeout(()=>{
+    const availableIndices=Array.from({length:PERKATAAN.length},((_,i)=>i)).filter(i=>!state.usedIndices.includes(i));
+    if(availableIndices.length>0){
+      const idx=availableIndices[Math.floor(Math.random()*availableIndices.length)];
+      state.usedIndices.push(idx);
+      state.rodaCurrentWord=PERKATAAN[idx];
+      playTone(523,0.15);
+      setTimeout(()=>playTone(659,0.15),100);
+      setTimeout(()=>playTone(784,0.2),200);
+    }
+    state.rodaIsSpinning=false;
+    render();
+  },spinDuration);
+}
+
+function confirmReadRoda(){
+  if(!state.rodaCurrentWord)return;
+  
+  playCorrect();
+  state.gameScore++;
+  state.lifetimeStats.correctAnswers++;
+  state.lifetimeStats.totalQuestionsAnswered++;
+  state.gameQ++;
+  
+  showSmallFireworks();
+  
+  setTimeout(()=>{
+    if(state.gameQ>=state.gameTotal){
+      state.gamePoints+=state.gameScore*2;
+      state.lifetimeStats.totalPointsEarned+=state.gameScore*2;
+      state.lifetimeStats.gamesCompleted++;
+      state.totalGamesPlayed++;
+      state.screen='gameResult';
+      checkAndUnlockBadges();
+      render();
+    } else {
+      state.rodaCurrentWord=null;
+      render();
+    }
+  },1200);
+}
+
+function renderGanjaran(){
+  const labels=['Kenal Huruf','Kenal Suku Kata','Boleh Membaca Ayat','Juara Permainan'];
+  const total=state.stars.filter(Boolean).length;
+  return `${navBar('🏆 Ganjaran','#FBBF24')}
+  <div class="mb-6 p-4 bg-white rounded-3xl card-shadow">
+    <div class="mb-3 flex items-center justify-between">
+      <span class="font-bold" style="color:#FBBF24">Bintang Dikumpul</span>
+      <span class="font-bold text-lg" style="color:#FBBF24">${total}/4</span>
+    </div>
+    <div class="flex-1 h-6 rounded-full overflow-hidden" style="background:#eee"><div class="h-full rounded-full transition-all flex items-center justify-center" style="width:${(total/4)*100}%;background:linear-gradient(90deg,#FFD700,#FFA500)"><span class="text-white font-bold text-sm" style="text-shadow:0 1px 2px rgba(0,0,0,0.2)">${Math.round((total/4)*100)}%</span></div></div>
+  </div>
+  <div class="bg-white rounded-3xl p-6 card-shadow text-center pop-in relative overflow-hidden" id="ganjaran-card">
+    <div class="text-5xl mb-2">🏆</div>
+    <div class="font-black text-2xl mb-4" style="color:#FBBF24">Pencapaian Saya</div>
+    <div class="flex flex-col gap-3 mb-6">
+      ${state.stars.map((s,i)=>`
+      <div class="flex items-center gap-3 p-3 rounded-2xl" style="background:${s?'#FFF8E1':'#f5f5f5'};border:2px solid ${s?'#FBBF24':'#ddd'}">
+        <span class="text-3xl">${s?'⭐':'☆'}</span>
+        <div class="text-left"><div class="font-bold" style="color:${s?'#FBBF24':'#999'}">Bintang ${i+1}</div><div class="text-sm font-semibold" style="color:${s?'#666':'#bbb'}">${labels[i]}</div></div>
+        ${s?'<span class="ml-auto text-green-500 font-bold">✅</span>':''}
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderInfo(){
+  return `${navBar('ℹ️ Tentang','#00BCD4')}
+  <div class="space-y-4 slide-up">
+    <div class="bg-white rounded-3xl p-6 card-shadow">
+      <div class="text-5xl text-center mb-3">📚✨</div>
+      <div class="font-black text-2xl text-center mb-2" style="color:#00BCD4">BUDI SMART</div>
+      <div class="text-center font-bold mb-4" style="color:#666">Buku Digital Interaktif Murid Pemulihan</div>
+    </div>
+    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 border-2 border-blue-300">
+      <div class="font-bold mb-2" style="color:#00BCD4">📖 Tentang Aplikasi</div>
+      <div class="text-sm text-gray-700 leading-relaxed">BUDI SMART adalah aplikasi pembelajaran interaktif yang dirancang khusus untuk murid-murid pemulihan. Aplikasi ini menyediakan pelajaran huruf, suku kata, perkataan, dan ayat dalam bahasa Melayu dengan cara yang berkesan.</div>
+    </div>
+    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 border-2 border-green-300">
+      <div class="font-bold mb-2" style="color:#10B981">🎯 Fitur Utama</div>
+      <div class="text-sm text-gray-700 leading-relaxed">
+        • 📖 Pembelajaran Huruf A-Z<br>
+        • 🔤 Pelajaran Suku Kata<br>
+        • 📝 Contoh Perkataan & Ayat<br>
+        • 🎮 5 Permainan Interaktif<br>
+        • 🏅 Sistem Badge & Pencapaian<br>
+        • 📊 Statistik Pembelajaran Lengkap<br>
+        • 📅 Cabaran Harian & Jalur Pembelajaran<br>
+        • 🎡 Roda Impian Perkataan
+      </div>
+    </div>
+    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 border-2 border-purple-300">
+      <div class="font-bold mb-2" style="color:#A78BFA">🎓 Untuk Ibu/Bapa & Cikgu</div>
+      <div class="text-sm text-gray-700 leading-relaxed">Aplikasi ini dilengkapi dengan profil pelajar, nota ibu/bapa, nasihat cikgu, dan statistik pembelajaran mendalam untuk membantu memantau kemajuan belajar anak secara masa nyata.</div>
+    </div>
+    <div class="bg-white rounded-2xl p-4 card-shadow text-center">
+      <div class="font-bold mb-2" style="color:#00BCD4">📢 Nota Ibu/Bapa</div>
+      <div class="text-sm font-semibold p-3 rounded-lg" style="background:#EFF6FF;color:#0369A1">"${state.parentNote}"</div>
+    </div>
+    <div class="bg-white rounded-2xl p-4 card-shadow text-center">
+      <div class="font-bold mb-2" style="color:#A78BFA">💡 Nasihat Cikgu</div>
+      <div class="text-sm font-semibold p-3 rounded-lg" style="background:#FAF5FF;color:#7C3AED">"${state.teacherTip}"</div>
+    </div>
+    <div class="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-4 border-2 border-yellow-300 text-center">
+      <div class="font-black" style="color:#EA580C">🌟 Selamat Belajar! 🌟</div>
+      <div class="font-bold text-sm mt-2" style="color:#EA580C">Teruskan usaha, kejayaan sudah menanti! 💪</div>
+    </div>
+  </div>`;
+}
+
+function go(screen){
+  state.screen=screen;
+  render();
+  queueSync();
+}
+
+// ---- Backend sync ----
+const BACKEND = (window.location.origin);
+const PROGRESS_KEYS = ['stars','gamePoints','streak','bestStreak','totalGamesPlayed','badges','lifetimeStats',
+  'wheelSpinCount','totalHurufLearned','totalAyatsRead','totalWordsLearned','perfectScores',
+  'studentAvatar','parentNote','teacherTip','dailyChallenge','lastPlayDate'];
+let syncTimer=null, syncBusy=false;
+function extractProgress(){
+  const o={}; PROGRESS_KEYS.forEach(k=>{ if(state[k]!==undefined) o[k]=state[k]; }); return o;
+}
+async function loadProgress(){
+  try{
+    const r=await fetch(BACKEND+'/api/progress',{credentials:'include'});
+    if(!r.ok) return;
+    const data=await r.json();
+    if(data.name) state.studentName=data.name;
+    const p=data.progress||{};
+    PROGRESS_KEYS.forEach(k=>{ if(p[k]!==undefined) state[k]=p[k]; });
+    render();
+  }catch(e){console.warn('loadProgress',e)}
+}
+async function syncNow(){
+  if(syncBusy) return;
+  syncBusy=true;
+  try{
+    await fetch(BACKEND+'/api/progress',{method:'PUT',credentials:'include',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(extractProgress())});
+  }catch(e){console.warn('sync',e)}
+  syncBusy=false;
+}
+function queueSync(){ clearTimeout(syncTimer); syncTimer=setTimeout(syncNow,1200); }
+// Hook render so any state change auto-syncs
+const _origRender=render;
+render=function(){ _origRender(); queueSync(); };
+// Hook save button in profile to sync immediately after name change
+loadProgress();
+window.addEventListener('beforeunload',()=>{
+  try{ navigator.sendBeacon && navigator.sendBeacon(BACKEND+'/api/progress',
+    new Blob([JSON.stringify(extractProgress())],{type:'application/json'})); }catch(e){}
+});
+
+function prevHuruf(){state.hurufIdx=Math.max(0,state.hurufIdx-1);render()}
+function nextHuruf(){state.hurufIdx=Math.min(HURUF.length-1,state.hurufIdx+1);render()}
+function prevSuku(){state.sukuIdx=Math.max(0,state.sukuIdx-1);render()}
+function nextSuku(){state.sukuIdx=Math.min(SUKUKATA.length-1,state.sukuIdx+1);render()}
+function prevPerk(){state.perkataanIdx=Math.max(0,state.perkataanIdx-1);render()}
+function nextPerk(){state.perkataanIdx=Math.min(PERKATAAN.length-1,state.perkataanIdx+1);render()}
+function prevAyat(){state.ayatIdx=Math.max(0,state.ayatIdx-1);render()}
+function nextAyat(){state.ayatIdx=Math.min(AYAT.length-1,state.ayatIdx+1);render()}
+
+render();
+  </script>
+ </body>
+</html>
